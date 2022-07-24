@@ -1,0 +1,1 @@
+. "${SUITDIR}/tests/rmcomment.sh"
