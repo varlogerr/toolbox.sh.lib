@@ -1,1 +1,0 @@
-. "${TESTDIR}/../lib/txt.sh"
