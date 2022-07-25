@@ -14,14 +14,19 @@ __rmcomment() {
     [hash]="${CONFDIR}/hash-file.conf"
     [semi]="${CONFDIR}/semi-file.conf"
   )
+  local file_cut_bak="$(local -f file_cut)"
 
-  ${cmd} "${file[hash]}" "${file[semi]}" 2> /dev/null
-  assert_rmcomment "${RC_ERR}" "${?}" "" "" \
-    "Fail with multiple files input"
+  {
+    file_cut() { return 1; }
+    ${cmd} "" 2> /dev/null
+    assert_rmcomment "${RC_ERR}" "${?}" "" "" \
+      "Fail on file_cut fail (file)"
 
-  ${cmd} "" 2> /dev/null
-  assert_rmcomment "${RC_ERR}" "${?}" "${exp_res}" "${act_res}" \
-    "Fail with unreadable file"
+    ${cmd} <<< "" 2> /dev/null
+    assert_rmcomment "${RC_ERR}" "${?}" "${exp_res}" "${act_res}" \
+      "Fail on file_cut fail (stdin)"
+    eval "${file_cut_bak}"
+  }
 
   exp_res="$(cat ${CONFDIR}/file-uncommented.conf)"
   for f in "${file[@]}"; do
