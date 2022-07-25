@@ -2,9 +2,10 @@ __is_readable() {
   unset __is_readable
 
   assert_is_readable() {
-    assert_result "${@:1:2}" "" "" "is_readable: ${3}"
+    assert_result "${@:1:2}" "" "" "readable: ${3}"
   }
 
+  local cmd=file_readable
   local RC_OK=0
   local RC_ERR=1
   declare -A path=(
@@ -15,29 +16,29 @@ __is_readable() {
   local perm_bak="$(stat -c '%a' "${path[file]}")"
   local input
 
-  file_is_readable "${FILES_DIR}/${GLOBAL_RANDVAL}.txt"
+  ${cmd} "${FILES_DIR}/${GLOBAL_RANDVAL}.txt"
   assert_is_readable "${RC_ERR}" "${?}" \
     "Fail on not existing file"
 
-  file_is_readable "${FILES_DIR}"
+  ${cmd} "${FILES_DIR}"
   assert_is_readable "${RC_ERR}" "${?}" \
     "Fail on directory"
 
   chmod "${perm_unread}" "${path[file]}"
   for f in "${path[@]}"; do
-    file_is_readable "${f}"
+    ${cmd} "${f}"
     assert_is_readable "${RC_ERR}" "${?}" \
       "Fail on unreadable file: $(basename -- "${f}")"
   done
   chmod "0${perm_bak}" "${path[file]}"
 
   for f in "${path[@]}"; do
-    file_is_readable "${f}"
+    ${cmd} "${f}"
     assert_is_readable "${RC_OK}" "${?}" \
       "Susseed on readable file: $(basename -- "${f}")"
   done
 
-  file_is_readable <(echo "${GLOBAL_RANDVAL}")
+  ${cmd} <(echo "${GLOBAL_RANDVAL}")
   assert_is_readable "${RC_OK}" "${?}" \
     "Susseed on named pipe"
 

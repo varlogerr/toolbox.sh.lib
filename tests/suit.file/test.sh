@@ -1,2 +1,2 @@
-. "${SUITDIR}/tests/is-readable.sh"
+. "${SUITDIR}/tests/readable.sh"
 # TODO: test file_cut

@@ -1,9 +1,9 @@
 # Check if PATH is file, symlik to file or named pipe
 # readabe be you. Usage:
 # ```
-# file_is_readable PATH && { echo "yes"; } || { echo "no"; }
+# file_readable PATH && { echo "yes"; } || { echo "no"; }
 # ```
-file_is_readable() {
+file_readable() {
   local path
   [[ -n "${1+x}" ]] && path="${1}"
 
@@ -25,27 +25,26 @@ file_is_readable() {
 # cat FILE | file_cut
 # ```
 file_cut() {
-  local file
+  local file="${1-${__SHLIB_NOPATH}}"
   local res
 
   [[ ${#} -gt 1 ]] && {
-    _print_err "Multiple files are not allowed"
+    _shlib_print_err "Multiple files are not allowed"
     return 1
   }
 
-  [[ -z "${1+x}" ]] && {
+  [[ "${file}" == "${__SHLIB_NOPATH}" ]] && {
     # Function reading from stdin
     # https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
     res="$(cat --; echo x)"
-    _print_res "${res%$'\n'x}"
+    _shlib_print_res "${res%$'\n'x}"
     return
   }
 
-  file="${1}"
-  file_is_readable "${file}" || {
-    _print_err "File must exist and to be readable by current user: ${file}"
+  file_readable "${file}" || {
+    _shlib_print_err "File must exist and to be readable by current user: ${file}"
     return 1
   }
 
-  _print_res "$(cat -- "${file}")"
+  _shlib_print_res "$(cat -- "${file}")"
 }
