@@ -26,7 +26,7 @@ file_cut() {
   local file
 
   [[ ${#} -gt 1 ]] && {
-    echo "[${FUNCNAME[0]}] Multiple files are not allowed" >&2
+    echo "Multiple files are not allowed" >&2
     return 1
   }
 
@@ -38,7 +38,7 @@ file_cut() {
   } || {
     file="${1}"
     file_is_readable "${file}" || {
-      echo "[${FUNCNAME[0]}] File must exist and to be readable by current user: ${file}" >&2
+      echo "File must exist and to be readable by current user: ${file}" >&2
       return 1
     }
     FUNCRET="$(cat -- "${file}")"
