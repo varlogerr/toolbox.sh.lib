@@ -14,6 +14,13 @@ file_is_readable() {
     && [[ -r "${path}" ]]
 }
 
+# Read from file or stdin.
+# Data is returned via global RETVAL variable
+# Usage:
+# ```
+# file_cut FILE
+# cat FILE | file_cut
+# ```
 file_cut() {
   local file
 
