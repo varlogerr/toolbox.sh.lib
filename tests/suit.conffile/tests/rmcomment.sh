@@ -16,11 +16,11 @@ __rmcomment() {
     file_cut() { return 1; }
 
     ${cmd} "" 2> /dev/null
-    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRET}" \
+    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRET+x}" \
       "Fail on file_cut fail (file)"
 
     ${cmd} <<< "" 2> /dev/null
-    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRET}" \
+    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRET+x}" \
       "Fail on file_cut fail (stdin)"
 
     eval "${file_cut_bak}"
