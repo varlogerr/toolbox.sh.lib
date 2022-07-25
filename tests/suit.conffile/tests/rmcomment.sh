@@ -7,8 +7,8 @@ __rmcomment() {
   local RC_OK=0
   local RC_ERR=1
   declare -A file=(
-    [hash]="${CONFDIR}/hash-file.conf"
-    [semi]="${CONFDIR}/semi-file.conf"
+    [hash]="${CONFDIR}/file-hash.conf"
+    [semi]="${CONFDIR}/file-semi.conf"
   )
   local file_cut_bak="$(local -f file_cut)"
 
