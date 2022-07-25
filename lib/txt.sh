@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Function reading from stdin
-# https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
-
 # left trim all lines in the text. usage:
 # ```
 # txt_ltrim FILE

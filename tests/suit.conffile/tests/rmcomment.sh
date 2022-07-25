@@ -1,5 +1,3 @@
-conffile_rmcomment 1 2 3
-
 __rmcomment() {
   unset __rmcomment
 
@@ -16,19 +14,14 @@ __rmcomment() {
     [hash]="${CONFDIR}/hash-file.conf"
     [semi]="${CONFDIR}/semi-file.conf"
   )
-  local file_is_readable_bak="$(declare -f file_is_readable)"
 
-  exp_res="[${cmd}] Multiple files are not allowed"
-  act_res="$(${cmd} "${file[hash]}" "${file[semi]}" 3>&1 2>&3 > /dev/null)"
-  assert_rmcomment "${RC_ERR}" "${?}" "${exp_res}" "${act_res}" \
+  ${cmd} "${file[hash]}" "${file[semi]}" 2> /dev/null
+  assert_rmcomment "${RC_ERR}" "${?}" "" "" \
     "Fail with multiple files input"
 
-  file_is_readable() { return 1; }
-  exp_res="[${cmd}] File must exist and to be readable by current user: "
-  act_res="$(${cmd} "" 3>&1 2>&3 > /dev/null)"
+  ${cmd} "" 2> /dev/null
   assert_rmcomment "${RC_ERR}" "${?}" "${exp_res}" "${act_res}" \
     "Fail with unreadable file"
-  eval "${file_is_readable_bak}"
 
   exp_res="$(cat ${CONFDIR}/file-uncommented.conf)"
   for f in "${file[@]}"; do
