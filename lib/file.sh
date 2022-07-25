@@ -4,7 +4,9 @@
 # file_is_readable PATH && { echo "yes"; } || { echo "no"; }
 # ```
 file_is_readable() {
-  local path="${1}"
+  local path
+  [[ -n "${1+x}" ]] && path="${1}"
+
   [[ (-L "${path}" && ! -p "${path}") ]] \
     && path="$(realpath -- "${path}")"
 
@@ -20,8 +22,7 @@ file_cut() {
     return 1
   }
 
-  [[ -n "${1+x}" ]] && file="${1}"
-  [[ -z "${file+x}" ]] && {
+  [[ -z "${1+x}" ]] && {
     # Function reading from stdin
     # https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
     RETVAL="$(cat --; echo x)"
@@ -29,6 +30,7 @@ file_cut() {
     return
   }
 
+  file="${1}"
   file_is_readable "${file}" || {
     echo "[${FUNCNAME[0]}] File must exist and to be readable by current user: ${file}" >&2
     return 1
