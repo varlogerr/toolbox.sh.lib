@@ -25,8 +25,8 @@ file_is_readable() {
 # cat FILE | file_cut
 # ```
 file_cut() {
-  unset FUNCRET
   local file
+  local res
 
   [[ ${#} -gt 1 ]] && {
     _print_err "Multiple files are not allowed"
@@ -36,16 +36,16 @@ file_cut() {
   [[ -z "${1+x}" ]] && {
     # Function reading from stdin
     # https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
-    FUNCRET="$(cat --; echo x)"
-    FUNCRET="${FUNCRET%$'\n'x}"
-  } || {
-    file="${1}"
-    file_is_readable "${file}" || {
-      _print_err "File must exist and to be readable by current user: ${file}"
-      return 1
-    }
-    FUNCRET="$(cat -- "${file}")"
+    res="$(cat --; echo x)"
+    _print_res "${res%$'\n'x}"
+    return
   }
 
-  printf -- '%s\n' "${FUNCRET}"
+  file="${1}"
+  file_is_readable "${file}" || {
+    _print_err "File must exist and to be readable by current user: ${file}"
+    return 1
+  }
+
+  _print_res "$(cat -- "${file}")"
 }

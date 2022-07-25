@@ -16,11 +16,11 @@ __rmcomment() {
     file_cut() { return 1; }
 
     ${cmd} "" 2> /dev/null
-    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRET+x}" \
+    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRES+x}" \
       "Fail on file_cut fail (file)"
 
     ${cmd} <<< "" 2> /dev/null
-    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRET+x}" \
+    assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRES+x}" \
       "Fail on file_cut fail (stdin)"
 
     eval "${file_cut_bak}"
@@ -29,11 +29,11 @@ __rmcomment() {
   exp_res="$(cat ${CONFDIR}/file-uncommented.conf)"
   for f in "${file[@]}"; do
     ${cmd} "${f}" > /dev/null
-    assert_rmcomment "${RC_OK}" "${?}" "${exp_res}" "${FUNCRET}" \
+    assert_rmcomment "${RC_OK}" "${?}" "${exp_res}" "${FUNCRES}" \
       "Uncomment file (file): $(basename -- "${f}")"
 
     ${cmd} <<< "$(cat "${f}")" > /dev/null
-    assert_rmcomment "${RC_OK}" "${?}" "${exp_res}" "${FUNCRET}" \
+    assert_rmcomment "${RC_OK}" "${?}" "${exp_res}" "${FUNCRES}" \
       "Uncomment file (stdin): $(basename -- "${f}")"
   done
 
