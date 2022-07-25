@@ -1,10 +1,6 @@
 __rmcomment() {
   unset __rmcomment
 
-  assert_rmcomment() {
-    assert_result "${@:1:4}" "(rmcomment) ${5}"
-  }
-
   local cmd=conffile_rmcomment
   local exp_res
   local act_res
