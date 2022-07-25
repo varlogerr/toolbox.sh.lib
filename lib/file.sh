@@ -15,6 +15,9 @@ file_is_readable() {
 }
 
 # Read from file or stdin.
+# If file doesn't exist or not readable or
+# multiple files provided, error is triggered.
+#
 # Data is returned via global FNCRET variable
 # Usage:
 # ```
