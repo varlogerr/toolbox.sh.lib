@@ -22,6 +22,7 @@ file_is_readable() {
 # cat FILE | file_cut
 # ```
 file_cut() {
+  unset RETVAL
   local file
 
   [[ ${#} -gt 1 ]] && {
@@ -34,13 +35,14 @@ file_cut() {
     # https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
     RETVAL="$(cat --; echo x)"
     RETVAL="${RETVAL%$'\n'x}"
-    return
+  } || {
+    file="${1}"
+    file_is_readable "${file}" || {
+      echo "[${FUNCNAME[0]}] File must exist and to be readable by current user: ${file}" >&2
+      return 1
+    }
+    RETVAL="$(cat -- "${file}")"
   }
 
-  file="${1}"
-  file_is_readable "${file}" || {
-    echo "[${FUNCNAME[0]}] File must exist and to be readable by current user: ${file}" >&2
-    return 1
-  }
-  RETVAL="$(cat -- "${file}")"
+  printf -- '%s\n' "${RETVAL}"
 }
