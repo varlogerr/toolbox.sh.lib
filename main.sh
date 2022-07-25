@@ -5,6 +5,7 @@ __main_source() {
 
   . "${curdir}/lib/conffile.sh"
   . "${curdir}/lib/file.sh"
+  . "${curdir}/lib/print.sh"
   . "${curdir}/lib/txt.sh"
 
 } && __main_source
