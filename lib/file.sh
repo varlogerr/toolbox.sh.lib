@@ -29,7 +29,7 @@ file_cut() {
   local res
 
   [[ ${#} -gt 1 ]] && {
-    _shlib_print_err "Multiple files are not allowed"
+    _shlib_print_err "Multiple files are not supported"
     return 1
   }
 
