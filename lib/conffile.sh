@@ -5,7 +5,7 @@
 # cat CONFFILE | conffile_rmcomment
 # ```
 conffile_rmcomment() {
-  unset RETVAL
+  unset FUNCRET
 
   [[ -z "${1+x}" ]] && {
     file_cut > /dev/null || return ${rc}
@@ -13,6 +13,6 @@ conffile_rmcomment() {
     file_cut "${@}" > /dev/null || return ${rc}
   }
 
-  RETVAL="$(grep -v -E '^\s*[#;].*$' <<< "${RETVAL}")"
-  printf -- '%s\n' "${RETVAL}"
+  FUNCRET="$(grep -v -E '^\s*[#;].*$' <<< "${FUNCRET}")"
+  printf -- '%s\n' "${FUNCRET}"
 }

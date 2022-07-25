@@ -15,14 +15,14 @@ file_is_readable() {
 }
 
 # Read from file or stdin.
-# Data is returned via global RETVAL variable
+# Data is returned via global FNCRET variable
 # Usage:
 # ```
 # file_cut FILE
 # cat FILE | file_cut
 # ```
 file_cut() {
-  unset RETVAL
+  unset FUNCRET
   local file
 
   [[ ${#} -gt 1 ]] && {
@@ -33,16 +33,16 @@ file_cut() {
   [[ -z "${1+x}" ]] && {
     # Function reading from stdin
     # https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
-    RETVAL="$(cat --; echo x)"
-    RETVAL="${RETVAL%$'\n'x}"
+    FUNCRET="$(cat --; echo x)"
+    FUNCRET="${FUNCRET%$'\n'x}"
   } || {
     file="${1}"
     file_is_readable "${file}" || {
       echo "[${FUNCNAME[0]}] File must exist and to be readable by current user: ${file}" >&2
       return 1
     }
-    RETVAL="$(cat -- "${file}")"
+    FUNCRET="$(cat -- "${file}")"
   }
 
-  printf -- '%s\n' "${RETVAL}"
+  printf -- '%s\n' "${FUNCRET}"
 }
