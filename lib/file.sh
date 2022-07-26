@@ -4,7 +4,7 @@
 # # -f, --listfile  provide a file with a list of files
 # #     (one per line, empty lines ignored). the LISTFILE
 # #     path is not checked for being readable! if it
-# #     doesn't exist or unreadable, the error is itnored
+# #     doesn't exist or unreadable, the error is ignored
 # # --out   print valid paths to out channel
 # # --err   print invalid paths to err channel
 # # -q, --quiet   suppress stdout and stderr
@@ -93,7 +93,9 @@ file_readable() {
 # # no output and return code 0 with no FILE provided.
 # # =====
 # # -f, --listfile  provide a file with a list of files
-# #     (one per line, empty lines ignored)
+# #     (one per line, empty lines ignored). the LISTFILE
+# #     path is not checked for being readable! if it
+# #     doesn't exist or unreadable, the error is ignored
 # # --err   print invalid files to err channel
 # # -q, --quiet   suppress stderr
 # file_cat [-f|--listfile LISTFILE...] [--err] \
@@ -103,8 +105,8 @@ file_readable() {
 # #     as files
 # file_cat -- [FLAG...] [PATH...]
 #
-# # LISTFILE from stdin
-# cat LISTFILE... | file_cat [FLAGS...]
+# # read LISTFILE from stdin
+# cat LISTFILE_FILE... | file_cat [FLAG...]
 # ```
 file_cat() {
   local file="${1-${__SHLIB_NOPATH}}"
