@@ -122,13 +122,13 @@ __readable() {
 
   for f in -f --listfile; do
     out_exp="${path[file]}"$'\n'"${path[lnk]}"
-    out_act="$("${cmd}" --out "${f}" <(echo "${path[file]}"$'\n'"${path[lnk]}"))"
+    out_act="$("${cmd}" --out "${f}" <(echo "${path[file]}"$'\n'$'\n'"${path[lnk]}"))"
     assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
-      "Read LISTFILE option: ${f}"
+      "Read LISTFILE option skipping empty lines: ${f}"
   done
 
   out_exp="${path[file]}"$'\n'"${path[lnk]}"
-  out_act="$(echo "${path[file]}"$'\n'"${path[lnk]}" | "${cmd}" --out)"
+  out_act="$(echo "${path[file]}"$'\n'$'\n'"${path[lnk]}" | "${cmd}" --out)"
   assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
-    "Read LISTFILE from stdin"
+    "Read LISTFILE from stdin skipping empty lines"
 } && __readable
