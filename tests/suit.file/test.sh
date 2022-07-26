@@ -1,2 +1,2 @@
 . "${SUITDIR}/tests/readable.sh"
-# TODO: test file_cut
+# TODO: test file_cat

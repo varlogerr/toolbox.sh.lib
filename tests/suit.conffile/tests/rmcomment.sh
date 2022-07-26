@@ -10,20 +10,20 @@ __rmcomment() {
     [hash]="${CONFDIR}/file-hash.conf"
     [semi]="${CONFDIR}/file-semi.conf"
   )
-  local file_cut_bak="$(local -f file_cut)"
+  local file_cat_bak="$(local -f file_cat)"
 
   {
-    file_cut() { return 1; }
+    file_cat() { return 1; }
 
     ${cmd} "" 2> /dev/null
     assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRES+x}" \
-      "Fail on file_cut fail (file)"
+      "Fail on file_cat fail (file)"
 
     ${cmd} <<< "" 2> /dev/null
     assert_rmcomment "${RC_ERR}" "${?}" "" "${FUNCRES+x}" \
-      "Fail on file_cut fail (stdin)"
+      "Fail on file_cat fail (stdin)"
 
-    eval "${file_cut_bak}"
+    eval "${file_cat_bak}"
   }
 
   exp_res="$(cat ${CONFDIR}/file-uncommented.conf)"

@@ -5,7 +5,7 @@
 # cat CONFFILE | conffile_rmcomment
 # ```
 conffile_rmcomment() {
-  file_cut "${@}" > /dev/null || return ${rc}
+  file_cat "${@}" > /dev/null || return ${rc}
 
   _shlib_print_res "$(grep -v -E '^\s*[#;].*$' <<< "${FUNCRES}")"
 }
