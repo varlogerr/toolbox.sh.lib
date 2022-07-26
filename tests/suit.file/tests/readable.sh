@@ -84,17 +84,26 @@ __readable() {
     "Susseed on named pipe (SHLIB_OUT)"
 
   out_exp="${path[file]}"$'\n'"${path[lnk]}"
-  out_act="$("${cmd}" --out "${path[file]}" "${path[lnk]}")"
-  assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
-    "Output to stdout"
+  {
+    out_act="$("${cmd}" --out "${path[file]}" "${path[lnk]}")"
+    assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
+      "Output to stdout"
 
-  out_exp="${path[file]}"$'\n'"${path[lnk]}"
-  "${cmd}" --out "${path[file]}" "${path[lnk]}" > /dev/null
-  assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_read1)" \
-    "Output to SHLIB_OUT"
+    "${cmd}" --out "${path[file]}" "${path[lnk]}" > /dev/null
+    assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_read1)" \
+      "Output to SHLIB_OUT"
+  }
 
-  # out_exp="${path_err[lnk]}"$'\n'"${path_err[file]}"
-  # out_act="$("${cmd}" "${path[lnk]}" "${path[file]}" --out)"
-  # assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
-  #   "Output to stdout"
+  out_exp="${path_err[lnk]}"$'\n'"${path_err[file]}"
+  {
+    out_act="$("${cmd}" "${path_err[lnk]}" "${path_err[file]}" \
+      --err 2>&1 1> /dev/null)"
+    assert_readable "${RC_ERR}" "${?}" "${out_exp}" "${out_act}" \
+      "Output to stderr"
+
+    "${cmd}" "${path_err[lnk]}" "${path_err[file]}" \
+      --err > /dev/null 2>&1
+    assert_readable "${RC_ERR}" "${?}" "${out_exp}" "$(shlib_read2)" \
+      "Output to SHLIB_ERR"
+  }
 } && __readable
