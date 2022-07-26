@@ -8,25 +8,25 @@
 # # --out   print valid paths to out channel
 # # --err   print invalid paths to err channel
 # # -q, --quiet   suppress stdout and stderr
-# file_readable [-f|--listfile LISTFILE...] [--out] \
-#   [--err] [-q|--quiet] PATH...
+# shlib_file_readable [-f|--listfile LISTFILE...] \
+#   [--out] [--err] [-q|--quiet] PATH...
 #
 # # --  endopts, i.e. flags after it will be treated
 # #     as paths
-# file_readable -- [FLAG...] PATH...
+# shlib_file_readable -- [FLAG...] PATH...
 #
 # # read LISTFILE from stdin
-# cat LISTFILE_FILE... | file_readable [FLAG...]
+# cat LISTFILE_FILE... | shlib_file_readable [FLAG...]
 # ```
 shlib_file_readable() {
   local paths=()
   local out=false
   local err=false
   local quiet=false
+  local aux
 
   local endopts=false
   local key
-  local aux
   while :; do
     [[ -n "${1+x}" ]] || break
     key="${1}"
@@ -80,15 +80,14 @@ shlib_file_readable() {
     fi
   done
 
-  [[ -n "${files_out+x}" ]] && shlib_print1 "${files_out}" "${quiet}"
   [[ -n "${files_err+x}" ]] && shlib_print2 "${files_err}" "${quiet}"
+  [[ -n "${files_out+x}" ]] && shlib_print1 "${files_out}" "${quiet}"
   return ${rc}
 }
 
-# Cat file or from stdin to out channel. If a file is
-# not readable file, symlik to file or named pipe by
-# defaultit will be silently skipped, but the return
-# code will be negative. Usage:
+# Cat file. If a file is not readable file, symlik to
+# file or named pipe by defaultit will be silently
+# skipped, but the return code will be negative. Usage:
 # ```
 # # no output and return code 0 with no FILE provided.
 # # =====
@@ -98,41 +97,67 @@ shlib_file_readable() {
 # #     doesn't exist or unreadable, the error is ignored
 # # --err   print invalid files to err channel
 # # -q, --quiet   suppress stderr
-# file_cat [-f|--listfile LISTFILE...] [--err] \
+# shlib_file_cat [-f|--listfile LISTFILE...] [--err] \
 #   [-q|--quiet] [FILE...]
 #
 # # --  endopts, i.e. flags after it will be treated
 # #     as files
-# file_cat -- [FLAG...] [PATH...]
+# shlib_file_cat -- [FLAG...] [PATH...]
 #
 # # read LISTFILE from stdin
-# cat LISTFILE_FILE... | file_cat [FLAG...]
+# cat LISTFILE_FILE... | shlib_file_cat [FLAG...]
 # ```
-file_cat() {
+shlib_file_cat() {
   local files=()
-  local out=false
-  local err=false
-  local quiet=false
   declare -a readable_flags=()
+  local aux
 
-  [[ ${#} -gt 1 ]] && {
-    _shlib_print_err "Multiple files are not supported"
-    return 1
+  local endopts=false
+  local key
+  while :; do
+    [[ -n "${1+x}" ]] || break
+    key="${1}"
+    # if endopts, all the params are positional
+    ${endopts} && key='*'
+
+    case "${key}" in
+      -f|--listfile )
+        shift
+        aux="$(grep -xvE -- '\s*' "${1}" 2> /dev/null)"
+        [[ -n "${aux}" ]] && {
+          mapfile -t aux <<< "${aux}"
+          files+=("${aux[@]}")
+        }
+        ;;
+      --err         ) readable_flags+=(--err) ;;
+      -q|--quiet    ) readable_flags+=(--quiet) ;;
+      --            ) endopts=true ;;
+      *             ) files+=("${1}") ;;
+    esac
+
+    shift
+  done
+
+  [[ ${#files[@]} -lt 1 ]] && {
+    aux="$(grep -xvE '\s*' 2> /dev/null)"
+    [[ -n "${aux}" ]] && {
+      mapfile -t aux <<< "${aux}"
+      files+=("${aux[@]}")
+    }
   }
 
-  [[ "${file}" == "${__SHLIB_NOPATH}" ]] && {
+  local rc=0
+  local res
+  [[ ${#files[@]} -lt 1 ]] && {
     # Function reading from stdin
     # https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
     res="$(cat --; echo x)"
   } || {
-    file_readable "${file}" || {
-      _shlib_print_err "File must exist and to be readable by current user: ${file}"
-      return 1
-    }
+    shlib_file_readable "${readable_flags[@]}" --out "${files[@]}" > /dev/null
+    rc=${?}
 
-    res="$(cat -- "${file}"; echo x)"
+    res="$(cat -- "$(shlib_flush1)"; echo x)"
   }
 
-  # _shlib_print_res "${res%$'\n'x}"
-  echo "${res}" | head -n -1
+  shlib_print1 "${res%$'\n'x}"
 }

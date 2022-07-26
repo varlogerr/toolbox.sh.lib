@@ -5,7 +5,7 @@
 # QUIET (bool) don't output to stdout
 shlib_print1() {
   local txt="${1}"
-  local quiet="${2:false}"
+  local quiet="${2:-false}"
   SHLIB_OUT="${txt}"
   ${quiet} || printf -- '%s\n' "${SHLIB_OUT}"
 }
@@ -17,7 +17,7 @@ shlib_print1() {
 # QUIET (bool) don't output to stdout
 shlib_print2() {
   local txt="${1}"
-  local quiet="${2:false}"
+  local quiet="${2:-false}"
   SHLIB_ERR="${txt}"
   ${quiet} || printf -- '%s\n' "${SHLIB_ERR}" >&2
 }
