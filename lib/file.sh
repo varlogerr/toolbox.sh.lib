@@ -1,16 +1,14 @@
 # Check PATH is file, symlik to file or named pipe
 # readabe by you. Usage:
 # ```
-# # just check all the files without any output
-# file_readable PATH... && { echo "yes"; } || { echo "no"; }
+# # just check all the files without any output. if no
+# # PATH is provided "yes" will be printed, as there is no
+# # invalid files
+# file_readable [PATH...] && { echo "yes"; } || { echo "no"; }
 #
 # # same as previous, just print valid files to out channel
-# file_readable --out PATH...
-#
-# # same as previous, but print invalid files to err channel
-# file_readable --err PATH...
-#
-# # quiet, don't output to stderr / stdout
+# # and invalid ones to err channel. with quiet flag
+# # stdout and stderr will be suppressed
 # file_readable [-q|--quiet] --out --err PATH...
 #
 # # with endopts (`--`) flags will be treated as a files
@@ -65,15 +63,14 @@ file_readable() {
   return ${rc}
 }
 
-# Read from file or stdin.
-# If file doesn't exist or not readable or
-# multiple files provided, error is triggered.
-#
-# Data is returned via global FNCRET variable
-# Usage:
+# Read from file or stdin. If a file is not readable
+# file, symlik to file or named pipe it will be silently
+# skipped. Usage:
 # ```
-# file_cat FILE
-# cat FILE | file_cat
+# # cat files
+# file_cat FILE...
+# file_cat FILE... [-q|--quiet] --err
+# cat FILE... | file_cat
 # ```
 file_cat() {
   local file="${1-${__SHLIB_NOPATH}}"

@@ -22,13 +22,13 @@ shlib_print2() {
   ${quiet} || printf -- '%s\n' "${SHLIB_ERR}" >&2
 }
 
-# Flush out channel
+# Flush out channel to stdout
 shlib_flush1() {
   printf -- '%s\n' "${SHLIB_OUT}"
   SHLIB_OUT=""
 }
 
-# Flush err channel
+# Flush err channel to stdout
 shlib_flush2() {
   printf -- '%s\n' "${SHLIB_ERR}"
   SHLIB_ERR=""
