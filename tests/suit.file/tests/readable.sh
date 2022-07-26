@@ -15,8 +15,8 @@ __readable() {
     [lnk]="${FILES_DIR}/file.lnk"
   )
   declare -A path_err=(
-    [file]="${FILES_DIR}/${GLOBAL_RANDVAL}.txt"
-    [lnk]="${FILES_DIR}/${GLOBAL_RANDVAL}.lnk"
+    [file]="${FILES_DIR}/${GLOB_RANDVAL}.txt"
+    [lnk]="${FILES_DIR}/${GLOB_RANDVAL}.lnk"
   )
   local perm_unread="0000"
   local perm_bak="0$(stat -c '%a' "${path[file]}")"
@@ -30,7 +30,7 @@ __readable() {
     "Success on no input (stdout)"
 
   "${cmd}"
-  assert_readable "${RC_OK}" "${?}" "" "$(shlib_read1)" \
+  assert_readable "${RC_OK}" "${?}" "" "$(shlib_flush1)" \
     "Success on no input (SHLIB_OUT)"
 
   out_act="$("${cmd}" "${path_err[file]}" 2>&1)"
@@ -38,7 +38,7 @@ __readable() {
     "Fail on not existing file (stderr)"
 
   "${cmd}" "${path_err[file]}"
-  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_read2)" \
+  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2)" \
     "Fail on not existing file (SHLIB_ERR)"
 
   out_act="$("${cmd}" "${FILES_DIR}" 2>&1)"
@@ -46,7 +46,7 @@ __readable() {
     "Fail on directory (stderr)"
 
   "${cmd}" "${FILES_DIR}"
-  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_read2)" \
+  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2)" \
     "Fail on directory (SHLIB_ERR)"
 
   {
@@ -58,7 +58,7 @@ __readable() {
         "Fail on unreadable file (stderr): $(basename -- "${f}")"
 
       "${cmd}" "${f}"
-      assert_readable "${RC_ERR}" "${?}" "" "$(shlib_read2)" \
+      assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2)" \
         "Fail on unreadable file (SHLIB_ERR): $(basename -- "${f}")"
     done
 
@@ -71,17 +71,19 @@ __readable() {
       "Susseed on readable file (stdout): $(basename -- "${f}")"
 
     "${cmd}" "${f}"
-    assert_readable "${RC_OK}" "${?}" "" "$(shlib_read1)" \
+    assert_readable "${RC_OK}" "${?}" "" "$(shlib_flush1)" \
       "Susseed on readable file (SHLIB_OUT): $(basename -- "${f}")"
   done
+  shlib_flush1 > /dev/null
 
   out_act="$("${cmd}" <(echo))"
   assert_readable "${RC_OK}" "${?}" "" "${out_act}" \
     "Susseed on named pipe (stdout)"
 
   "${cmd}" <(echo)
-  assert_readable "${RC_OK}" "${?}" "" "$(shlib_read1)" \
+  assert_readable "${RC_OK}" "${?}" "" "$(shlib_flush1)" \
     "Susseed on named pipe (SHLIB_OUT)"
+  shlib_flush1 > /dev/null
 
   out_exp="${path[file]}"$'\n'"${path[lnk]}"
   {
@@ -90,8 +92,9 @@ __readable() {
       "Output to stdout"
 
     "${cmd}" --out "${path[file]}" "${path[lnk]}" > /dev/null
-    assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_read1)" \
+    assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_flush1)" \
       "Output to SHLIB_OUT"
+    shlib_flush1 > /dev/null
   }
 
   out_exp="${path_err[lnk]}"$'\n'"${path_err[file]}"
@@ -103,8 +106,9 @@ __readable() {
 
     "${cmd}" "${path_err[lnk]}" "${path_err[file]}" \
       --err > /dev/null 2>&1
-    assert_readable "${RC_ERR}" "${?}" "${out_exp}" "$(shlib_read2)" \
+    assert_readable "${RC_ERR}" "${?}" "${out_exp}" "$(shlib_flush2)" \
       "Output to SHLIB_ERR"
+    shlib_flush2 > /dev/null
   }
 
   out_act="$(cd "${FILES_DIR}"; "${cmd}" --out --err)"

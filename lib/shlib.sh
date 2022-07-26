@@ -22,12 +22,14 @@ shlib_print2() {
   ${quiet} || printf -- '%s\n' "${SHLIB_ERR}" >&2
 }
 
-# Print last message from out channel
-shlib_read1() {
+# Flush out channel
+shlib_flush1() {
   printf -- '%s\n' "${SHLIB_OUT}"
+  SHLIB_OUT=""
 }
 
-# Print last message from err channel
-shlib_read2() {
+# Flush err channel
+shlib_flush2() {
   printf -- '%s\n' "${SHLIB_ERR}"
+  SHLIB_ERR=""
 }
