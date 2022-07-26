@@ -160,4 +160,5 @@ shlib_file_cat() {
   }
 
   shlib_print1 "${res%$'\n'x}"
+  return ${rc}
 }

@@ -7,19 +7,19 @@ __readable() {
     assert_result "${@:1:4}" "readable: ${5}"
   }
 
-  local cmd=shlib_file_readable
-  local RC_OK=0
-  local RC_ERR=1
-  declare -A path=(
+  local -r cmd=shlib_file_readable
+  local -r RC_OK=0
+  local -r RC_ERR=1
+  declare -rA path=(
     [file]="${FILES_DIR}/file.txt"
     [lnk]="${FILES_DIR}/file.lnk"
   )
-  declare -A path_err=(
+  declare -rA path_err=(
     [file]="${FILES_DIR}/${GLOB_RANDVAL}.txt"
     [lnk]="${FILES_DIR}/${GLOB_RANDVAL}.lnk"
   )
-  local perm_unread="0000"
-  local perm_bak="0$(stat -c '%a' "${path[file]}")"
+  local -r perm_unread="0000"
+  local -r perm_bak="0$(stat -c '%a' "${path[file]}")"
   local out_act
   local out_exp
   local out_act
