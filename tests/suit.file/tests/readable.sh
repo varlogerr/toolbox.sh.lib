@@ -106,4 +106,13 @@ __readable() {
     assert_readable "${RC_ERR}" "${?}" "${out_exp}" "$(shlib_read2)" \
       "Output to SHLIB_ERR"
   }
+
+  out_act="$(cd "${FILES_DIR}"; "${cmd}" --out --err)"
+  assert_readable "${RC_OK}" "${?}" "" "${out_act}" \
+    "Consider flag named file to be a flag"
+
+  out_exp="--out"$'\n'"--err"
+  out_act="$(cd "${FILES_DIR}"; "${cmd}" --out -- --out --err)"
+  assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
+    "Consider flag named file to be a file after endopts"
 } && __readable
