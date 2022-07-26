@@ -119,4 +119,16 @@ __readable() {
   out_act="$(cd "${FILES_DIR}"; "${cmd}" --out -- --out --err)"
   assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
     "Read flag named file as a file after endopts"
+
+  for f in -f --listfile; do
+    out_exp="${path[file]}"$'\n'"${path[lnk]}"
+    out_act="$("${cmd}" --out "${f}" <(echo "${path[file]}"$'\n'"${path[lnk]}"))"
+    assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
+      "Read LISTFILE option: ${f}"
+  done
+
+  out_exp="${path[file]}"$'\n'"${path[lnk]}"
+  out_act="$(echo "${path[file]}"$'\n'"${path[lnk]}" | "${cmd}" --out)"
+  assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
+    "Read LISTFILE from stdin"
 } && __readable

@@ -1,16 +1,22 @@
 # Check PATH is file, symlik to file or named pipe
 # readabe by you or return falsy return code. Usage:
 # ```
-# # if no PATH is provided return code will be 0.
-# # ======
+# # -f, --listfile  provide a file with a list of files
+# #     (one per line, empty lines ignored). the LISTFILE
+# #     path is not checked for being readable! if it
+# #     doesn't exist or unreadable, the error is itnored
 # # --out   print valid paths to out channel
 # # --err   print invalid paths to err channel
 # # -q, --quiet   suppress stdout and stderr
-# file_readable [--out] [--err] [-q|--quiet] [PATH...]
+# file_readable [-f|--listfile LISTFILE...] [--out] \
+#   [--err] [-q|--quiet] PATH...
 #
 # # --  endopts, i.e. flags after it will be treated
 # #     as paths
-# file_readable -- [FLAG...] [PATH...]
+# file_readable -- [FLAG...] PATH...
+#
+# # read LISTFILE from stdin
+# cat LISTFILE_FILE... | file_readable [FLAG...]
 # ```
 file_readable() {
   local paths=()
@@ -20,21 +26,39 @@ file_readable() {
 
   local endopts=false
   local key
+  local aux
   while :; do
     [[ -n "${1+x}" ]] || break
     key="${1}"
+    # if endopts, all the params are positional
     ${endopts} && key='*'
 
     case "${key}" in
-      -q|--quiet  ) quiet=true ;;
-      --out       ) out=true ;;
-      --err       ) err=true ;;
-      --          ) endopts=true ;;
-      *           ) paths+=("${1}") ;;
+      -f|--listfile )
+        shift
+        aux="$(grep -xvE -- '\s*' "${1}" 2> /dev/null)"
+        [[ -n "${aux}" ]] && {
+          mapfile -t aux <<< "${aux}"
+          paths+=("${aux[@]}")
+        }
+      ;;
+      -q|--quiet    ) quiet=true ;;
+      --out         ) out=true ;;
+      --err         ) err=true ;;
+      --            ) endopts=true ;;
+      *             ) paths+=("${1}") ;;
     esac
 
     shift
   done
+
+  [[ ${#paths[@]} -lt 1 ]] && {
+    aux="$(grep -xvE '\s*' 2> /dev/null)"
+    [[ -n "${aux}" ]] && {
+      mapfile -t aux <<< "${aux}"
+      paths+=("${aux[@]}")
+    }
+  }
 
   local rc=0
   local files_out
