@@ -18,7 +18,7 @@
 # # read LISTFILE from stdin
 # cat LISTFILE_FILE... | file_readable [FLAG...]
 # ```
-file_readable() {
+shlib_file_readable() {
   local paths=()
   local out=false
   local err=false

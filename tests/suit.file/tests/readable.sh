@@ -7,7 +7,7 @@ __readable() {
     assert_result "${@:1:4}" "readable: ${5}"
   }
 
-  local cmd=file_readable
+  local cmd=shlib_file_readable
   local RC_OK=0
   local RC_ERR=1
   declare -A path=(
