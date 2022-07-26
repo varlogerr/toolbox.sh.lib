@@ -1,18 +1,16 @@
 # Check PATH is file, symlik to file or named pipe
-# readabe by you. Usage:
+# readabe by you or return falsy return code. Usage:
 # ```
-# # just check all the files without any output. if no
-# # PATH is provided "yes" will be printed, as there is no
-# # invalid files
-# file_readable [PATH...] && { echo "yes"; } || { echo "no"; }
+# # if no PATH is provided return code will be 0.
+# # ======
+# # --out   print valid paths to out channel
+# # --err   print invalid paths to err channel
+# # -q, --quiet   suppress stdout and stderr
+# file_readable [--out] [--err] [-q|--quiet] [PATH...]
 #
-# # same as previous, just print valid files to out channel
-# # and invalid ones to err channel. with quiet flag
-# # stdout and stderr will be suppressed
-# file_readable [-q|--quiet] --out --err PATH...
-#
-# # with endopts (`--`) flags will be treated as a files
-# file_readable -- --err PATH...
+# # --  endopts, i.e. flags after it will be treated
+# #     as paths
+# file_readable -- [FLAG...] [PATH...]
 # ```
 file_readable() {
   local paths=()
@@ -63,13 +61,25 @@ file_readable() {
   return ${rc}
 }
 
-# Read from file or stdin. If a file is not readable
-# file, symlik to file or named pipe it will be silently
-# skipped. Usage:
+# Cat file or from stdin to out channel. If a file is
+# not readable file, symlik to file or named pipe by
+# defaultit will be silently skipped, but the return
+# code will be negative. Usage:
 # ```
-# # cat files
-# file_cat FILE...
-# file_cat FILE... [-q|--quiet] --err
+# # no output and return code 0 with no FILE provided.
+# # =====
+# # -f, --listfile  provide a file with a list of files
+# #     (one per line, empty lines ignored), multiple
+# # --err   print invalid files to err channel
+# # -q, --quiet   suppress stderr
+# file_cat [-f|--listfile LISTFILE] [--err] \
+#   [-q|--quiet] [FILE...]
+#
+# # --  endopts, i.e. flags after it will be treated
+# #     as files
+# file_cat -- [FLAG...] [PATH...]
+#
+# # from stdin
 # cat FILE... | file_cat
 # ```
 file_cat() {
