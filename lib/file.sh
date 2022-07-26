@@ -41,8 +41,7 @@ shlib_file_readable() {
           mapfile -t aux <<< "${aux}"
           paths+=("${aux[@]}")
         }
-      ;;
-      -q|--quiet    ) quiet=true ;;
+        ;;
       --out         ) out=true ;;
       --err         ) err=true ;;
       --            ) endopts=true ;;
@@ -109,8 +108,11 @@ shlib_file_readable() {
 # cat LISTFILE_FILE... | file_cat [FLAG...]
 # ```
 file_cat() {
-  local file="${1-${__SHLIB_NOPATH}}"
-  local res
+  local files=()
+  local out=false
+  local err=false
+  local quiet=false
+  declare -a readable_flags=()
 
   [[ ${#} -gt 1 ]] && {
     _shlib_print_err "Multiple files are not supported"
