@@ -44,6 +44,7 @@ shlib_file_readable() {
         ;;
       --out         ) out=true ;;
       --err         ) err=true ;;
+      -q|--quiet    ) quiet=true ;;
       --            ) endopts=true ;;
       *             ) paths+=("${1}") ;;
     esac

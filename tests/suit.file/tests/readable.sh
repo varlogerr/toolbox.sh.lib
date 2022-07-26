@@ -97,6 +97,19 @@ __readable() {
     shlib_flush1 > /dev/null
   }
 
+  for f in -q --quiet; do
+    out_exp=""
+    out_act="$("${cmd}" --out ${f} "${path[file]}" "${path[lnk]}")"
+    assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
+      "Suppress stdout: ${f}"
+
+    out_exp="${path[file]}"$'\n'"${path[lnk]}"
+    "${cmd}" --out ${f} "${path[file]}" "${path[lnk]}"
+    assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_flush1)" \
+      "Don't suppress SHLIB_OUT: ${f}"
+    shlib_flush1 > /dev/null
+  done
+
   out_exp="${path_err[lnk]}"$'\n'"${path_err[file]}"
   {
     out_act="$("${cmd}" "${path_err[lnk]}" "${path_err[file]}" \
