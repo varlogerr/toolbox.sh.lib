@@ -71,11 +71,21 @@ __readable() {
       "Susseed on readable file (SHLIB_OUT): $(basename -- "${f}")"
   done
 
-  out_act="$("${cmd}" <(echo "${GLOBAL_RANDVAL}"))"
+  out_act="$("${cmd}" <(echo))"
   assert_readable "${RC_OK}" "${?}" "" "${out_act}" \
     "Susseed on named pipe (stdout)"
 
-  "${cmd}" <(echo "${GLOBAL_RANDVAL}")
+  "${cmd}" <(echo)
   assert_readable "${RC_OK}" "${?}" "" "$(shlib_read1)" \
     "Susseed on named pipe (SHLIB_OUT)"
+
+  out_exp="${path[lnk]}"$'\n'"${path[file]}"
+  out_act="$("${cmd}" "${path[lnk]}" "${path[file]}" --out)"
+  assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
+    "Output to stdout"
+
+  out_exp="${path[lnk]}"$'\n'"${path[file]}"
+  "${cmd}" "${path[lnk]}" "${path[file]}" --out > /dev/null
+  assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_read1)" \
+    "Output to SHLIB_OUT"
 } && __readable
