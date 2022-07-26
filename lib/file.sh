@@ -69,18 +69,18 @@ file_readable() {
 # # no output and return code 0 with no FILE provided.
 # # =====
 # # -f, --listfile  provide a file with a list of files
-# #     (one per line, empty lines ignored), multiple
+# #     (one per line, empty lines ignored)
 # # --err   print invalid files to err channel
 # # -q, --quiet   suppress stderr
-# file_cat [-f|--listfile LISTFILE] [--err] \
+# file_cat [-f|--listfile LISTFILE...] [--err] \
 #   [-q|--quiet] [FILE...]
 #
 # # --  endopts, i.e. flags after it will be treated
 # #     as files
 # file_cat -- [FLAG...] [PATH...]
 #
-# # from stdin
-# cat FILE... | file_cat
+# # LISTFILE from stdin
+# cat LISTFILE... | file_cat [FLAGS...]
 # ```
 file_cat() {
   local file="${1-${__SHLIB_NOPATH}}"
