@@ -14,6 +14,10 @@ __readable() {
     [file]="${FILES_DIR}/file.txt"
     [lnk]="${FILES_DIR}/file.lnk"
   )
+  declare -A path_err=(
+    [file]="${FILES_DIR}/${GLOBAL_RANDVAL}.txt"
+    [lnk]="${FILES_DIR}/${GLOBAL_RANDVAL}.lnk"
+  )
   local perm_unread="0000"
   local perm_bak="0$(stat -c '%a' "${path[file]}")"
   local out_act
@@ -29,11 +33,11 @@ __readable() {
   assert_readable "${RC_OK}" "${?}" "" "$(shlib_read1)" \
     "Success on no input (SHLIB_OUT)"
 
-  out_act="$("${cmd}" "${FILES_DIR}/${GLOBAL_RANDVAL}.txt" 2>&1)"
+  out_act="$("${cmd}" "${path_err[file]}" 2>&1)"
   assert_readable "${RC_ERR}" "${?}" "" "${out_act}" \
     "Fail on not existing file (stderr)"
 
-  "${cmd}" "${FILES_DIR}/${GLOBAL_RANDVAL}.txt"
+  "${cmd}" "${path_err[file]}"
   assert_readable "${RC_ERR}" "${?}" "" "$(shlib_read2)" \
     "Fail on not existing file (SHLIB_ERR)"
 
