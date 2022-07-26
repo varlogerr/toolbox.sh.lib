@@ -109,10 +109,10 @@ __readable() {
 
   out_act="$(cd "${FILES_DIR}"; "${cmd}" --out --err)"
   assert_readable "${RC_OK}" "${?}" "" "${out_act}" \
-    "Consider flag named file to be a flag"
+    "Read flag named file as a flag"
 
   out_exp="--out"$'\n'"--err"
   out_act="$(cd "${FILES_DIR}"; "${cmd}" --out -- --out --err)"
   assert_readable "${RC_OK}" "${?}" "${out_exp}" "${out_act}" \
-    "Consider flag named file to be a file after endopts"
+    "Read flag named file as a file after endopts"
 } && __readable
