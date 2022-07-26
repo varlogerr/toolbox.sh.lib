@@ -22,7 +22,6 @@ __readable() {
   local -r perm_bak="0$(stat -c '%a' "${path[file]}")"
   local out_act
   local out_exp
-  local out_act
 
 
   out_act="$("${cmd}")"
