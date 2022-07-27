@@ -2,6 +2,7 @@ __main_source() {
   unset __main_source
 
   export SHLIB_CHANNEL1_COUNT=0
+  export SHLIB_CHANNEL2_COUNT=0
 
   local curdir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
