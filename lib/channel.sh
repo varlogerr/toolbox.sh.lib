@@ -77,7 +77,7 @@ shlib_channel1_flush() {
 
 # Print to channel2.
 # FLAGS:
-#   -q, --quiet   suppress stdout
+#   -q, --quiet   suppress stderr
 #   --            endopts
 # RC:
 #   0 - messages printed to the channel
@@ -90,7 +90,7 @@ shlib_channel2_print() {
   declare -a msgs
   local quiet=false
 
-  shlib_channel2_flush > /dev/null
+  shlib_channel2_flush 2> /dev/null
 
   local endopts=false
   local key
@@ -135,7 +135,7 @@ shlib_channel2_is_empty() {
   return 0
 }
 
-# Flush channel2 to stdout
+# Flush channel2 to stderr
 # RC:
 #   0 - channel2 is empty
 #   1 - channel2 is not empty
@@ -147,7 +147,7 @@ shlib_channel2_is_empty() {
 shlib_channel2_flush() {
   shlib_channel2_is_empty && return 1
 
-  printf -- '%s\n' "${SHLIB_CHANNEL2}"
+  printf -- '%s\n' "${SHLIB_CHANNEL2}" >&2
   unset SHLIB_CHANNEL2
   return 0
 }
