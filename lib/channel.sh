@@ -29,7 +29,9 @@ shlib_channel1_add() {
     case "${key}" in
       --prepend ) prepend=true ;;
       --        ) endopts=true ;;
-      *         ) msgs+="${msgs+$'\n'}* ${1}" ;;
+      *         ) msgs+="${msgs+$'\n'}$(
+          sed -e 's/^/  /' -e '1 s/^ /*/' <<< "${1}"
+        )" ;;
     esac
 
     shift
@@ -51,6 +53,16 @@ shlib_channel1_add() {
 }
 
 # Check channel1 state. Usage:
+# ```sh
+# shlib_channel1_is_empty \
+#   && echo "Empty" || echo "Not empty"
+# ```
+shlib_channel1_is_empty() {
+  [[ -n "${SHLIB_CHANNEL1+x}" ]] && return 1
+  return 0
+}
+
+# Get chennel1 object count. Usage:
 # ```sh
 # shlib_channel1_is_empty \
 #   && echo "Empty" || echo "Not empty"
