@@ -64,4 +64,16 @@ __channel() {
       "channel2_print: SHLIB_CHANNEL2 contains message on ${f} flag"
   done
 
+  {
+    out_exp="-q"$'\n'"--query"$'\n'"--"
+    input=("-q" "--query" "--")
+
+    out_act="$(shlib_channel1_print -- "${input[@]}")"
+    assert_result "0" "$?" "${out_exp}" "${out_act}" \
+      "channel1_print: Print flags to stdout as messages after --"
+
+    out_act="$(shlib_channel2_print -- "${input[@]}" 2>&1 1>/dev/null)"
+    assert_result "0" "$?" "${out_exp}" "${out_act}" \
+      "channel2_print: Print flags to stderr as messages after --"
+  }
 } && __channel
