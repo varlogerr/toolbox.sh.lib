@@ -14,7 +14,7 @@ shlib_print1() {
 # ```sh
 # shlib_print2 MSG [PREFIX] [QUIET]
 # ```
-# QUIET (bool) don't output to stdout
+# QUIET (bool) don't output to stderr
 shlib_print2() {
   local txt="${1}"
   local quiet="${2:-false}"
@@ -28,8 +28,8 @@ shlib_flush1() {
   SHLIB_OUT=""
 }
 
-# Flush err channel to stdout
+# Flush err channel to stderr
 shlib_flush2() {
-  printf -- '%s\n' "${SHLIB_ERR}"
+  printf -- '%s\n' "${SHLIB_ERR}" >&2
   SHLIB_ERR=""
 }

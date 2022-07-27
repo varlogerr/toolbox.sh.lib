@@ -25,6 +25,9 @@ shlib_file_readable() {
   local quiet=false
   local aux
 
+  shlib_flush1 > /dev/null
+  shlib_flush2 2> /dev/null
+
   local endopts=false
   local key
   while :; do

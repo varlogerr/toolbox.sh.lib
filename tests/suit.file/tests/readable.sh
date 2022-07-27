@@ -32,32 +32,32 @@ __readable() {
   assert_readable "${RC_OK}" "${?}" "" "$(shlib_flush1)" \
     "Success on no input (SHLIB_OUT)"
 
-  out_act="$("${cmd}" "${path_err[file]}" 2>&1)"
+  out_act="$("${cmd}" "${path_err[file]}" 2>&1 1>/dev/null)"
   assert_readable "${RC_ERR}" "${?}" "" "${out_act}" \
     "Fail on not existing file (stderr)"
 
   "${cmd}" "${path_err[file]}"
-  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2)" \
+  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2 2>&1 1> /dev/null)" \
     "Fail on not existing file (SHLIB_ERR)"
 
-  out_act="$("${cmd}" "${FILES_DIR}" 2>&1)"
+  out_act="$("${cmd}" "${FILES_DIR}" 2>&1 1>/dev/null)"
   assert_readable "${RC_ERR}" "${?}" "" "${out_act}" \
     "Fail on directory (stderr)"
 
   "${cmd}" "${FILES_DIR}"
-  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2)" \
+  assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2 2>&1 1>/dev/null)" \
     "Fail on directory (SHLIB_ERR)"
 
   {
     chmod "${perm_unread}" "${path[file]}"
 
     for f in "${path[@]}"; do
-      out_act="$("${cmd}" "${f}" 2>&1)"
+      out_act="$("${cmd}" "${f}" 2>&1 1>/dev/null)"
       assert_readable "${RC_ERR}" "${?}" "" "${out_act}" \
         "Fail on unreadable file (stderr): $(basename -- "${f}")"
 
       "${cmd}" "${f}"
-      assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2)" \
+      assert_readable "${RC_ERR}" "${?}" "" "$(shlib_flush2 2>&1 1>/dev/null)" \
         "Fail on unreadable file (SHLIB_ERR): $(basename -- "${f}")"
     done
 
@@ -73,7 +73,6 @@ __readable() {
     assert_readable "${RC_OK}" "${?}" "" "$(shlib_flush1)" \
       "Susseed on readable file (SHLIB_OUT): $(basename -- "${f}")"
   done
-  shlib_flush1 > /dev/null
 
   out_act="$("${cmd}" <(echo))"
   assert_readable "${RC_OK}" "${?}" "" "${out_act}" \
@@ -82,7 +81,6 @@ __readable() {
   "${cmd}" <(echo)
   assert_readable "${RC_OK}" "${?}" "" "$(shlib_flush1)" \
     "Susseed on named pipe (SHLIB_OUT)"
-  shlib_flush1 > /dev/null
 
   out_exp="${path[file]}"$'\n'"${path[lnk]}"
   {
@@ -93,7 +91,6 @@ __readable() {
     "${cmd}" --out "${path[file]}" "${path[lnk]}" > /dev/null
     assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_flush1)" \
       "Output to SHLIB_OUT"
-    shlib_flush1 > /dev/null
   }
 
   for f in -q --quiet; do
@@ -106,7 +103,6 @@ __readable() {
     "${cmd}" --out ${f} "${path[file]}" "${path[lnk]}"
     assert_readable "${RC_OK}" "${?}" "${out_exp}" "$(shlib_flush1)" \
       "Don't suppress SHLIB_OUT: ${f}"
-    shlib_flush1 > /dev/null
   done
 
   out_exp="${path_err[lnk]}"$'\n'"${path_err[file]}"
@@ -118,9 +114,8 @@ __readable() {
 
     "${cmd}" "${path_err[lnk]}" "${path_err[file]}" \
       --err > /dev/null 2>&1
-    assert_readable "${RC_ERR}" "${?}" "${out_exp}" "$(shlib_flush2)" \
+    assert_readable "${RC_ERR}" "${?}" "${out_exp}" "$(shlib_flush2 2>&1 1>/dev/null)" \
       "Output to SHLIB_ERR"
-    shlib_flush2 > /dev/null
   }
 
   out_act="$(cd "${FILES_DIR}"; "${cmd}" --out --err)"
