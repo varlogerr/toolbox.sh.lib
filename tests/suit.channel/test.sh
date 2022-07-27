@@ -33,7 +33,7 @@ __channel() {
 
     out_act="$(shlib_channel2_print "${input[@]}" 2>&1 1>/dev/null)"
     assert_result "0" "$?" "${out_exp}" "${out_act}" \
-      "channel1_print: Print multi messages to stderr"
+      "channel2_print: Print multi messages to stderr"
 
     shlib_channel1_print "${input[@]}" >/dev/null
     assert_result "0" "$?" "${out_exp}" "${SHLIB_CHANNEL1}" \
@@ -41,7 +41,7 @@ __channel() {
 
     shlib_channel2_print "${input[@]}" 2>/dev/null
     assert_result "0" "$?" "${out_exp}" "${SHLIB_CHANNEL2}" \
-      "channel1_print: SHLIB_CHANNEL2 contains multi messages"
+      "channel2_print: SHLIB_CHANNEL2 contains multi messages"
   }
 
   for f in -q --quiet; do
