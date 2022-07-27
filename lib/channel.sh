@@ -1,58 +1,54 @@
-# Add to channel1. Appends by default
-# Flags:
-# --prepend   add before current channel msgs
-# --          endopts, following it arguments
-#     will be processed as positional
-# Return codes:
-# 0 - messages added
-# 1 - no messages added
-# Usage:
+# Print to channel1.
+# FLAGS:
+#   -q, --quiet   suppress stdout
+#   --            endopts
+# RC:
+#   0 - messages printed to the channel
+#   1 - no messages printed to the channel
+# USAGE:
 # ```sh
-# # add message via argument
-# shlib_channel1_add [--prepend] [--] MSG...
-# # no messages added
-# shlib_channel1_add [--prepend] [--] \
-#   || echo "Not added"
+# shlib_channel1_print [-q|--quiet] [--] [MSG...]
 # ```
-shlib_channel1_add() {
-  local msgs
-  local prepend=false
+shlib_channel1_print() {
+  declare -a msgs
+  local quiet=false
+
+  shlib_channel1_flush > /dev/null
 
   local endopts=false
   local key
   while :; do
     [[ -n "${1+x}" ]] || break
-    key="${1}"
     # if endopts, all the params are positional
-    ${endopts} && key='*'
+    ${endopts} && key='*' || key="${1}"
 
     case "${key}" in
-      --prepend ) prepend=true ;;
-      --        ) endopts=true ;;
-      *         ) msgs+="${msgs+$'\n'}$(
-          sed -e 's/^/  /' -e '1 s/^ /*/' <<< "${1}"
-        )" ;;
+      -q|--quiet  ) quiet=true ;;
+      --          ) endopts=true ;;
+      *           ) msgs+=("${1}") ;;
     esac
 
     shift
   done
 
-  [[ -n "${msgs}" ]] || return 1
+  local msgs_count=${#msgs[@]}
+  [[ ${msgs_count} -gt 0 ]] || return 1
 
-  [[ -n "${SHLIB_CHANNEL1+x}" ]] || {
-    export SHLIB_CHANNEL1
-  }
+  (( SHLIB_CHANNEL1_COUNT++ ))
 
-  ${prepend} && {
-    SHLIB_CHANNEL1="${msgs}${SHLIB_CHANNEL1+$'\n'}${SHLIB_CHANNEL1}"
-  } || {
-    SHLIB_CHANNEL1+="${SHLIB_CHANNEL1+$'\n'}${msgs}"
-  }
+  export SHLIB_CHANNEL1
+  SHLIB_CHANNEL1="$(printf -- '%s\n' "${msgs[@]}"; echo x)"
+  SHLIB_CHANNEL1="${SHLIB_CHANNEL1%$'\n'x}"
 
-  return 1
+  ${quiet} || printf -- '%s\n' "${SHLIB_CHANNEL1}"
+  return 0
 }
 
-# Check channel1 state. Usage:
+# Check channel1 state.
+# RC:
+#   0 - channel1 is empty
+#   1 - channel1 is not empty
+# USAGE:
 # ```sh
 # shlib_channel1_is_empty \
 #   && echo "Empty" || echo "Not empty"
@@ -62,15 +58,65 @@ shlib_channel1_is_empty() {
   return 0
 }
 
-# Get chennel1 object count. Usage:
+# Flush channel1 to stdout
+# RC:
+#   0 - channel1 is empty
+#   1 - channel1 is not empty
+# USAGE:
 # ```sh
-# shlib_channel1_is_empty \
-#   && echo "Empty" || echo "Not empty"
+# shlib_channel1_is_empty
+# [[ ${?} ]] && echo "Empty" || echo "Not empty"
 # ```
-shlib_channel1_is_empty() {
-  [[ -n "${SHLIB_CHANNEL1+x}" ]] && return 1
+shlib_channel1_flush() {
+  shlib_channel1_is_empty && return 1
+
+  printf -- '%s\n' "${SHLIB_CHANNEL1}"
+  unset SHLIB_CHANNEL1
   return 0
 }
+
+
+# # Check channel1 state. Usage:
+# # ```sh
+# # shlib_channel1_is_empty \
+# #   && echo "Empty" || echo "Not empty"
+# # ```
+# shlib_channel1_is_empty() {
+#   [[ -n "${SHLIB_CHANNEL1+x}" ]] && return 1
+#   return 0
+# }
+
+# # Get chennel1 object count. Usage:
+# # ```sh
+# # shlib_channel1_is_empty \
+# #   && echo "Empty" || echo "Not empty"
+# # ```
+# shlib_channel1_len() {
+#   grep -c -- '^\*' <<< "${SHLIB_CHANNEL1}"
+# }
+
+# shlib_channel1_to_arr() {
+#   shlib_channel1_is_empty && return 1
+
+#   declare -n arr="${1}"
+
+#   local line
+#   declare -a aux
+#   local ctr=-1
+
+#   mapfile -t aux <<< "${SHLIB_CHANNEL1}"
+#   for line in "${aux[@]}"; do
+#     [[ "${line}" == '* '* ]] && {
+#       (( ctr++ ))
+#       arr[$ctr]="${line:2}"
+#       continue
+#     }
+
+#     arr[$ctr]+=$'\n'"${line:2}"
+#   done
+
+#   return 0
+# }
 
 # # Flush out channel1 to stdout. Usage:
 # # ```sh
