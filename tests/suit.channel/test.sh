@@ -17,3 +17,6 @@ shlib_channel1_flush
 
 echo '======'
 shlib_channel1_is_empty && echo "Empty" || echo "Not empty"
+
+echo '======'
+shlib_channel1_count

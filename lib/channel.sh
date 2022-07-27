@@ -34,7 +34,7 @@ shlib_channel1_print() {
   local msgs_count=${#msgs[@]}
   [[ ${msgs_count} -gt 0 ]] || return 1
 
-  (( SHLIB_CHANNEL1_COUNT++ ))
+  SHLIB_CHANNEL1_COUNT=$(( SHLIB_CHANNEL1_COUNT + ${msgs_count} ))
 
   export SHLIB_CHANNEL1
   SHLIB_CHANNEL1="$(printf -- '%s\n' "${msgs[@]}"; echo x)"
@@ -75,6 +75,15 @@ shlib_channel1_flush() {
   return 0
 }
 
+# Get count of messages passed through channel1
+# USAGE:
+# ```sh
+# [[ shlib_channel1_count -gt 0 ]] \
+#   && echo "Messages" || echo "No messages"
+# ```
+shlib_channel1_count() {
+  printf -- '%d\n' "${SHLIB_CHANNEL1_COUNT}"
+}
 
 # # Check channel1 state. Usage:
 # # ```sh
