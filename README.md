@@ -1,5 +1,15 @@
 # `sh.lib`
 
+## Usage in projects
+
+```sh
+# include all the libs
+. {path-to-sh.lib}/main.sh
+# include all the libs with aliases
+. {path-to-sh.lib}/main.sh aliased
+
+```
+
 ## Development
 
 * install dependencies

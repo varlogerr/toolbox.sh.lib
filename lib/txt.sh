@@ -1,74 +1,74 @@
-#!/bin/bash
-
-# Function reading from stdin
-# https://unix.stackexchange.com/questions/154485/how-do-i-capture-stdin-to-a-variable-without-stripping-any-trailing-newlines
-
-# left trim all lines in the text. usage:
-# ```
-# txt_ltrim FILE
-# txt_ltrim <<< "  words"
-# ```
-txt_ltrim() {
-  local txt="${1}"
-  [[ -z "${1+x}" ]] && {
-    txt="$(cat; echo x)"
-    txt="${txt%$'\n'x}"
-  } || { txt="$(cat -- "${txt}")"; }
-  sed -E 's/^\s+//' <<< "${txt}"
+#
+# ALIASES
+#
+${aliased} && {
+  ltrim() { shlib_txt_ltrim "${@}"; }
+  rtrim() { shlib_txt_rtrim "${@}"; }
+  trim() { shlib_txt_trim "${@}"; }
+  rmblank() { shlib_txt_rmblank "${@}"; }
+  txt_ltrim() { shlib_txt_ltrim "${@}"; }
+  txt_rtrim() { shlib_txt_rtrim "${@}"; }
+  txt_trim() { shlib_txt_trim "${@}"; }
+  txt_rmblank() { shlib_txt_rmblank "${@}"; }
 }
 
-# right trim all lines in the text. usage:
+# Left trim all lines in the text.
+# Silently ignore unreadable files
+#
+# USAGE:
 # ```
-# txt_rtrim FILE
-# txt_rtrim <<< "words  "
+# shlib_txt_ltrim [-f|--listfile LISTFILE...] \
+#   [--] [-] [FILE...] [<<< TEXT]
 # ```
-txt_rtrim() {
-  local txt="${1}"
-  [[ -z "${1+x}" ]] && {
-    txt="$(cat; echo x)"
-    txt="${txt%$'\n'x}"
-  } || { txt="$(cat -- "${txt}")"; }
-  sed -E 's/\s+$//' <<< "${txt}"
+shlib_txt_ltrim() {
+  shlib_file_cat "${@}" | sed -E 's/^\s+//'
 }
 
-# trim all lines in the text. usage:
+# Right trim all lines in the text.
+# Silently ignore unreadable files
+#
+# USAGE:
 # ```
-# txt_trim FILE
-# txt_trim <<< "  words  "
+# shlib_txt_rtrim [-f|--listfile LISTFILE...] \
+#   [--] [-] [FILE...] [<<< TEXT]
 # ```
-txt_trim() {
-  local txt="${1}"
-  [[ -z "${1+x}" ]] && {
-    txt="$(cat; echo x)"
-    txt="${txt%$'\n'x}"
-  } || { txt="$(cat -- "${txt}")"; }
-  sed -E -e 's/^\s+//' -e 's/\s+$//' <<< "${txt}"
+shlib_txt_rtrim() {
+  shlib_file_cat "${@}" | sed -E 's/\s+$//'
 }
 
-# rm blank and spaces only lines in the text. usage:
+# Trim all lines in the text.
+# Silently ignore unreadable files
+#
+# USAGE:
 # ```
-# txt_rmblank FILE
-# txt_rmblank <<< "line1"$'\n'$'\n'"line3"
+# shlib_txt_trim [-f|--listfile LISTFILE...] \
+#   [--] [-] [FILE...] [<<< TEXT]
 # ```
-txt_rmblank() {
-  local txt="${1}"
-  [[ -z "${1+x}" ]] && {
-    txt="$(cat; echo x)"
-    txt="${txt%$'\n'x}"
-  } || { txt="$(cat -- "${txt}")"; }
-  grep -v -E '^\s*$' <<< "${txt}"
+shlib_txt_trim() {
+  shlib_txt_ltrim "${@}" | shlib_txt_rtrim
 }
 
+# rm blank and spaces only lines in the text.
+# Silently ignore unreadable files
+#
+# USAGE:
+# ```
+# shlib_txt_rmblank [-f|--listfile LISTFILE...] \
+#   [--] [-] [FILE...] [<<< TEXT]
+# ```
+shlib_txt_rmblank() {
+  shlib_file_cat "${@}" | grep -v -E '^\s*$'
+}
+
+# TODO mv to conffile module
 # rm comment lines from the text. usage:
+#
+# USAGE:
 # ```
-# txt_rmcomment FILE
-# txt_rmcomment <<< "  line1"$'\n'"# comment"
+# txt_rmcomment [-f|--listfile LISTFILE...] \
+#   [--] [-] [FILE...] [<<< TEXT]
 # ```
 txt_rmcomment() {
-  local txt="${1}"
-  [[ -z "${1+x}" ]] && {
-    txt="$(cat; echo x)"
-    txt="${txt%$'\n'x}"
-  } || { txt="$(cat -- "${txt}")"; }
-  grep -v -E '^\s*#.*$' <<< "${txt}"
+  echo "txt_rmcomment deprecated" >&2
+  shlib_file_cat "${@}" | grep -v -E '^\s*#.*$'
 }

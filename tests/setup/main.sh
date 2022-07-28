@@ -1,0 +1,1 @@
+. "${TESTDIR}/../main.sh" aliased
