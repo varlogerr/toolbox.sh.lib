@@ -4,6 +4,7 @@
 ${aliased} && {
   conf_strip() { shlib_conf_strip "${@}"; }
   conf_parse() { shlib_conf_parse "${@}"; }
+  conf_validate_format() { shlib_conf_validate_format "${@}"; }
 }
 
 # Strip down conffile to only section, meta and
@@ -46,7 +47,7 @@ shlib_conf_strip() {
   shlib_txt_trim "${tail[@]}" | shlib_txt_rmblank \
   | grep -E '^\s*(['"${prefix}"']\s*'"${meta_rex}"'|[^'"${prefix}"']+)$' \
   | sed -E 's/^([^'"${prefix}"'\[][^ =]+)\s*=\s*/\1=/' \
-  | sed -E 's/^#\s*'"${meta_rex}"'/#@meta[\1]=\3/'
+  | sed -E 's/^(['"${prefix}"'])\s*'"${meta_rex}"'/\1@meta[\2]=\4/'
 }
 
 # Strip down conffile to only section, meta and
@@ -56,7 +57,7 @@ shlib_conf_strip() {
 #
 # USAGE:
 # ```sh
-# shlib_conf_strip [-f|--listfile LISTFILE...] \
+# shlib_conf_parse [-f|--listfile LISTFILE...] \
 #   [-p|--prefix COMMENT_REFIX] [--var CONFVAR] \
 #   [--] [-] [FILE...] [<<< TEXT]
 # ```
@@ -73,12 +74,13 @@ shlib_conf_strip() {
 # ```sh
 # # preserve result to CONFIG map and suppress output
 # declare -A CONFIG
-# shlib_conf_strip file.conf --var CONFIG > /dev/null
+# shlib_conf_parse file.conf --var CONFIG > /dev/null
 # ```
 shlib_conf_parse() {
   declare -a tail=()
+  declare prefix='#;'
   declare varname
-  local __config_pars
+  local -A __config_pars
 
   local endopts=false
   local key
@@ -86,15 +88,16 @@ shlib_conf_parse() {
     [[ -n "${1}" ]] || break
     ${endopts} && key='*' || key="${1}"
     case "${key}" in
-      --var   ) shift; local -n __config_pars="${1}" ;;
-      --      ) endopts=true; tail+=("${1}") ;;
-      *       ) tail+=("${1}") ;;
+      --var       ) shift; unset __config_pars; local -n __config_pars="${1}" ;;
+      -p|--prefix ) prefix="${2}"; shift; tail+=("${1}" "${prefix}") ;;
+      --          ) endopts=true; tail+=("${1}") ;;
+      *           ) tail+=("${1}") ;;
     esac
     shift
   done
 
   local content="$(shlib_conf_strip "${tail[@]}")"
-  content="$(__shlib_conf_desect sections "${content}")"
+  content="$(__shlib_conf_desect sections "${content}" "${prefix}")"
 
   local content_arr
   local key
@@ -109,16 +112,22 @@ shlib_conf_parse() {
   printf -- '%s\n' "${content}"
 }
 
+shlib_conf_validate_format() {
+  :
+}
+
 __shlib_conf_desect() {
   local -n __sections="${1}"
   local content="${2}"
+  local prefix="${3}"
+  prefix="$(shlib_sed_escape_key "${prefix}")"
 
   local -A sections
   local section=""
   local metas=()
   local name_rex='\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]'
-  local meta_rex='#@meta\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]=(.*)'
-  local prefix
+  local meta_rex="[${prefix}]"'@meta\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]=(.*)'
+  local key_prefix
   while read -r l; do
     grep -Exq "${name_rex}" <<< "${l}" && {
       section="$(sed -Ee 's/^'"${name_rex}"'$/\1/' <<< "${l}")"
@@ -130,12 +139,12 @@ __shlib_conf_desect() {
       continue
     }
 
-    prefix="${section}${section:+@}"
+    key_prefix="${section}${section:+@}"
 
     [[ ${#metas[@]} -gt 0 ]] \
-      && printf -- "${prefix}${l%%=*}@"'%s\n' "${metas[@]}"
+      && printf -- "${key_prefix}${l%%=*}@"'%s\n' "${metas[@]}"
 
-    printf -- "${prefix}"'%s\n' "${l}"
+    printf -- "${key_prefix}"'%s\n' "${l}"
 
     # printf -- "${section}"${l%*=}'.%s\n' "${l}"
     # [[ ${#metas[@]} -gt 0 ]] && printf -- "${section}"'.%s\n' "${metas[@]}"
