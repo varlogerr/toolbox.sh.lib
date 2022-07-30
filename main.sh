@@ -6,7 +6,7 @@ __shlib_main() {
 
   local curdir="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
   local libdir="${curdir}/lib"
-  local libs="$(find "${libdir}" -type f -maxdepth 1 -name '*.sh')"
+  local libs="$(find "${libdir}" -maxdepth 1 -type f -name '*.sh')"
   declare -a libs_arr
   mapfile -t libs_arr <<< "${libs}"
 
