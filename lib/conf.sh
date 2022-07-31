@@ -4,7 +4,7 @@
 ${aliased} && {
   conf_strip() { shlib_conf_strip "${@}"; }
   conf_parse() { shlib_conf_parse "${@}"; }
-  conf_validate_format() { shlib_conf_validate_format "${@}"; }
+  conf_check_format() { shlib_conf_check_format "${@}"; }
 }
 
 # Strip down conffile to only section, meta and
@@ -111,7 +111,7 @@ shlib_conf_parse() {
   printf -- '%s\n' "${content}"
 }
 
-shlib_conf_validate_format() {
+shlib_conf_check_format() {
   :
 }
 
