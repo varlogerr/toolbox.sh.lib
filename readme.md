@@ -1,5 +1,7 @@
 # `sh.lib`
 
+* [Exit codes](./lib/excode.md)
+* [`shlib_sed_*`](./lib/sed.md)
 * [`shlib_msgbag_*`](./lib/msgbag.md)
 
 ## Usage in projects
