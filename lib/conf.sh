@@ -104,8 +104,7 @@ shlib_conf_parse() {
   local val
   mapfile -t content_arr <<< "${content}"
   for i in "${content_arr[@]}"; do
-    key="${i%%=*}"
-    val="${i#*=}"
+    key="${i%%=*}"; val="${i#*=}"
     __config_pars[$key]="${val}"
   done
 
@@ -139,7 +138,7 @@ __shlib_conf_desect() {
       continue
     }
 
-    key_prefix="${section}${section:+@}"
+    key_prefix="${section}@"
 
     [[ ${#metas[@]} -gt 0 ]] \
       && printf -- "${key_prefix}${l%%=*}@"'%s\n' "${metas[@]}"
