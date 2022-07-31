@@ -1,5 +1,7 @@
 # `sh.lib`
 
+* [`shlib_msgbag_*`](./lib/msgbag.md)
+
 ## Usage in projects
 
 ```sh
@@ -7,7 +9,6 @@
 . {path-to-sh.lib}/main.sh
 # include all the libs with aliases
 . {path-to-sh.lib}/main.sh aliased
-
 ```
 
 ## Development
