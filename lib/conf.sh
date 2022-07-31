@@ -97,7 +97,7 @@ shlib_conf_parse() {
   done
 
   local content="$(shlib_conf_strip "${tail[@]}")"
-  content="$(__shlib_conf_desect sections "${content}" "${prefix}")"
+  content="$(__shlib_conf_desect "${content}" "${prefix}")"
 
   local content_arr
   local key
@@ -116,9 +116,8 @@ shlib_conf_check_format() {
 }
 
 __shlib_conf_desect() {
-  local -n __sections="${1}"
-  local content="${2}"
-  local prefix="${3}"
+  local content="${1}"
+  local prefix="${2}"
   prefix="$(shlib_sed_escape_key "${prefix}")"
 
   local -A sections
