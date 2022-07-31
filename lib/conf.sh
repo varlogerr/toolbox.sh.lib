@@ -13,17 +13,17 @@ ${aliased} && {
 # USAGE:
 # ```sh
 # shlib_conf_strip [-f|--listfile LISTFILE...] \
-#   [-p|--prefix COMMENT_REFIX] [--] [-] [FILE...] [<<< TEXT]
+#   [-c|--compref COMMENT_REFIX] [--] [-] [FILE...] [<<< TEXT]
 # ```
 #
 # OPTIONS:
 # -f, --listfile  provide a file with a list of files
 #     (one per line, empty lines ignored).
-# -p, --prefix  comment line prefix char, defaults to '#;'
-# --  endopts
-# -   substituted by text comming from stdin
+# -c, --compref   comment line prefix char, defaults to '#;'
+# --              endopts
+# -               substituted by text comming from stdin
 shlib_conf_strip() {
-  declare prefix='#;'
+  declare compref='#;'
   declare -a tail=()
 
   local endopts=false
@@ -32,22 +32,22 @@ shlib_conf_strip() {
     [[ -n "${1}" ]] || break
     ${endopts} && key='*' || key="${1}"
     case "${key}" in
-      -p|--prefix ) shift; prefix="${1}" ;;
-      --          ) endopts=true; tail+=("${1}") ;;
-      *           ) tail+=("${1}") ;;
+      -c|--compref  ) shift; compref="${1}" ;;
+      --            ) endopts=true; tail+=("${1}") ;;
+      *             ) tail+=("${1}") ;;
     esac
     shift
   done
 
-  prefix="$(shlib_sed_escape_key "${prefix}")"
+  compref="$(shlib_sed_escape_key "${compref}")"
 
   local meta_rex='@meta\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]\s*=\s*(.*)'
   # strip blank lines | strip non-meta comments \
   # | unspace '=' | unspace meta comments
   shlib_txt_trim "${tail[@]}" | shlib_txt_rmblank \
-  | grep -E '^\s*(['"${prefix}"']\s*'"${meta_rex}"'|[^'"${prefix}"']+)$' \
-  | sed -E 's/^([^'"${prefix}"'\[][^ =]+)\s*=\s*/\1=/' \
-  | sed -E 's/^(['"${prefix}"'])\s*'"${meta_rex}"'/\1@meta[\2]=\4/'
+  | grep -E '^\s*(['"${compref}"']\s*'"${meta_rex}"'|[^'"${compref}"']+)$' \
+  | sed -E 's/^([^'"${compref}"'\[][^ =]+)\s*=\s*/\1=/' \
+  | sed -E 's/^(['"${compref}"'])\s*'"${meta_rex}"'/\1@meta[\2]=\4/'
 }
 
 # Strip down conffile to only section, meta and
@@ -58,14 +58,14 @@ shlib_conf_strip() {
 # USAGE:
 # ```sh
 # shlib_conf_parse [-f|--listfile LISTFILE...] \
-#   [-p|--prefix COMMENT_REFIX] [--var CONFVAR] \
+#   [-c|--compref COMMENT_REFIX] [--var CONFVAR] \
 #   [--] [-] [FILE...] [<<< TEXT]
 # ```
 #
 # OPTIONS:
 # -f, --listfile  provide a file with a list of files
 #     (one per line, empty lines ignored).
-# -p, --prefix    comment line prefix char, defaults to '#;'
+# -c, --compref   comment line prefix char, defaults to '#;'
 # --var           put result to CONFVAR
 # --              endopts
 # -               substituted by text comming from stdin
@@ -78,7 +78,7 @@ shlib_conf_strip() {
 # ```
 shlib_conf_parse() {
   declare -a tail=()
-  declare prefix='#;'
+  declare compref='#;'
   declare varname
   local -A __config_pars
 
@@ -88,16 +88,16 @@ shlib_conf_parse() {
     [[ -n "${1}" ]] || break
     ${endopts} && key='*' || key="${1}"
     case "${key}" in
-      --var       ) shift; unset __config_pars; local -n __config_pars="${1}" ;;
-      -p|--prefix ) prefix="${2}"; shift; tail+=("${1}" "${prefix}") ;;
-      --          ) endopts=true; tail+=("${1}") ;;
-      *           ) tail+=("${1}") ;;
+      --var         ) shift; unset __config_pars; local -n __config_pars="${1}" ;;
+      -c|--compref  ) compref="${2}"; shift; tail+=("${1}" "${compref}") ;;
+      --            ) endopts=true; tail+=("${1}") ;;
+      *             ) tail+=("${1}") ;;
     esac
     shift
   done
 
   local content="$(shlib_conf_strip "${tail[@]}")"
-  content="$(__shlib_conf_desect "${content}" "${prefix}")"
+  content="$(__shlib_conf_desect "${content}" "${compref}")"
 
   local content_arr
   local key
@@ -117,14 +117,14 @@ shlib_conf_check_format() {
 
 __shlib_conf_desect() {
   local content="${1}"
-  local prefix="${2}"
-  prefix="$(shlib_sed_escape_key "${prefix}")"
+  local compref="${2}"
+  compref="$(shlib_sed_escape_key "${compref}")"
 
   local -A sections
   local section=""
   local metas=()
   local name_rex='\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]'
-  local meta_rex="[${prefix}]"'@meta\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]=(.*)'
+  local meta_rex="[${compref}]"'@meta\[([a-zA-Z]+([-_\.a-zA-Z0-9]+[a-zA-Z0-9])?)\]=(.*)'
   local key_prefix
   while read -r l; do
     grep -Exq "${name_rex}" <<< "${l}" && {
