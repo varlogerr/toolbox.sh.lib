@@ -1,6 +1,6 @@
 # <a id="top"></a>`shlib_sed_*`
 
-[To main](./../readme.md)
+[< To main](./../readme.md)
 
 * [Intro](#intro)
 * [`shlib_sed_escape_rex`](#escape-rex)
@@ -10,15 +10,15 @@
 
 TBD
 
-[To top]
+[^ To top]
 
 ## <a id="escape-rex"></a>`shlib_sed_escape_rex`
 
-Escape REX for sed regex value
+Escape `REX` for `sed` regex value
 
 **Aliases**: `sed_escape_rex`
 
-**Dependencies**: `excode`
+**Dependencies**: `shlib_excode`
 
 ### Usage
 
@@ -48,15 +48,15 @@ escaped_rex="$(sed_escape_rex "*")"
 sed 's/'"${escaped_rex}"'//g' <<< 'rm "*" occurrences'
 ```
 
-[To top]
+[^ To top]
 
 ## <a id="escape-replace"></a>`shlib_sed_escape_replace`
 
-Escape REPLACE for sed replace value
+Escape `REPLACE` for `sed` replace value
 
 **Aliases**: `sed_escape_replace`
 
-**Dependencies**: `excode`
+**Dependencies**: `shlib_excode`
 
 ### Usage
 
@@ -86,6 +86,6 @@ escaped_replace="$(sed_escape_replace "/")"
 sed 's/a/'"${escaped_replace}"'/g' <<< 'replace "a" with "/"'
 ```
 
-[To top]
+[^ To top]
 
-[To top]: #top
+[^ To top]: #top

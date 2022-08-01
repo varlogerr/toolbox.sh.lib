@@ -6,65 +6,65 @@ ${aliased} && {
 # https://stackoverflow.com/a/2705678
 
 shlib_sed_escape_rex() {
-  local -A opts
+  local -A _er_opts
 
-  __shlib_sed_escape_parse_opts opts "${@}" || return ${?}
+  __shlib_sed_escape_parse_opts _er_opts "${@}" || return ${?}
 
-  local rex="${opts[pos]}"
-  local __retvar_escape_rex
-  [[ -n "${opts[retvar]+x}" ]] && {
-    local -n __retvar_escape_rex="${opts[retvar]}" \
+  local _er_rex="${_er_opts[pos]}"
+  local _er_retvarname
+  [[ -n "${_er_opts[retvar]+x}" ]] && {
+    local -n _er_retvarname="${_er_opts[retvar]}" \
       2>/dev/null || return "${SHLIB_ERRSYS}"
   }
 
-  __retvar_escape_rex="$(sed -e 's/[]\/$*.^[]/\\&/g' <<< "${rex}")"
-  printf '%s\n' "${__retvar_escape_rex}"
+  _er_retvarname="$(sed -e 's/[]\/$*.^[]/\\&/g' <<< "${_er_rex}")"
+  printf '%s\n' "${_er_retvarname}"
   return "${SHLIB_OK}"
 }
 
 shlib_sed_escape_replace() {
-  local -A opts
+  local -A _er_opts
 
-  __shlib_sed_escape_parse_opts opts "${@}" || return ${?}
+  __shlib_sed_escape_parse_opts _er_opts "${@}" || return ${?}
 
-  local replace="${opts[pos]}"
-  local __retvar_escape_replace
-  [[ -n "${opts[retvar]+x}" ]] && {
-    local -n __retvar_escape_replace="${opts[retvar]}" \
+  local _er_replace="${_er_opts[pos]}"
+  local _er_retvarname
+  [[ -n "${_er_opts[retvar]+x}" ]] && {
+    local -n _er_retvarname="${_er_opts[retvar]}" \
       2>/dev/null || return "${SHLIB_ERRSYS}"
   }
 
-  __retvar_escape_replace="$(sed -e 's/[\/&]/\\&/g' <<< "${replace}")"
-  printf '%s\n' "${__retvar_escape_replace}"
+  _er_retvarname="$(sed -e 's/[\/&]/\\&/g' <<< "${_er_replace}")"
+  printf '%s\n' "${_er_retvarname}"
   return "${SHLIB_OK}"
 }
 
 __shlib_sed_escape_parse_opts() {
-  local -n __opts="${1}"
+  local -n _epo_opts="${1}"
   shift
-  local -a retvar=()
-  local -a pos=()
+  local -a _epo_retvarnames=()
+  local -a _epo_positional=()
 
-  local endopts=false
-  local key
+  local _epo_endopts=false
+  local _epo_key
   while :; do
     [[ -n ${1+x} ]] || break
-    ${endopts} && key='*' || key="${1}"
+    ${_epo_endopts} && _epo_key='*' || _epo_key="${1}"
 
-    case "${key}" in
-      --          ) endopts=true ;;
-      -r|--retvar ) shift; retvar+=("${1}") ;;
-      *           ) pos+=("${1}") ;;
+    case "${_epo_key}" in
+      --          ) _epo_endopts=true ;;
+      -r|--retvar ) shift; _epo_retvarnames+=("${1}") ;;
+      *           ) _epo_positional+=("${1}") ;;
     esac
 
     shift
   done
 
-  [[ ${#pos[@]} -ne 1 ]] && return "${SHLIB_ERRSYS}"
-  [[ ${#retvar[@]} -gt 1 ]] && return "${SHLIB_ERRSYS}"
+  [[ ${#_epo_positional[@]} -ne 1 ]] && return "${SHLIB_ERRSYS}"
+  [[ ${#_epo_retvarnames[@]} -gt 1 ]] && return "${SHLIB_ERRSYS}"
 
-  __opts[pos]="${pos[0]}"
-  [[ ${#retvar[@]} -gt 0 ]] && __opts[retvar]="${retvar[0]}"
+  _epo_opts[pos]="${_epo_positional[0]}"
+  [[ ${#_epo_retvarnames[@]} -gt 0 ]] && _epo_opts[retvar]="${_epo_retvarnames[0]}"
 
   return "${SHLIB_OK}"
 }
