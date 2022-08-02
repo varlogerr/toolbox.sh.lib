@@ -17,8 +17,8 @@ shlib_excode_is_valid() {
   shift
 
   [[ ${#} -gt 0 ]] && return ${SHLIB_ERRSYS}
-  [[ "${code}" =~ ^[0-9]+$ ]] || return ${SHLIB_KO}
-  [[ ${code} -gt 255 ]] && return ${SHLIB_KO}
+  test "${code}" -ge 0 2>/dev/null \
+    && test "${code}" -le 255 2>/dev/null || return ${SHLIB_KO}
 
   return ${SHLIB_OK}
 }
