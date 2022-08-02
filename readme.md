@@ -1,6 +1,7 @@
 # `sh.lib`
 
 * [`shlib_excode_*`](./lib/excode.md)
+* [`shlib_list_*`](./lib/list.md)
 * [`shlib_sed_*`](./lib/sed.md)
 * [`shlib_msgbag_*`](./lib/msgbag.md)
 
