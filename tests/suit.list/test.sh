@@ -20,4 +20,22 @@ __test_from_args() {
   ${cmd} -r retvar
   assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${retvar-x}" \
     "succeeds with SHLIB_OK and no RETVAR on empty input"
+
+  ${cmd} -r -retvar
+  assert_from_args "${SHLIB_ERRSYS}" "${?}" "" "" \
+    "fails with SHLIB_ERRSYS on invalid RETVAR"
+
+  res_exp="* "
+  {
+    res_act="$(${cmd} "")"
+    assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${res_act}" \
+      "single item list to stdout on empty string input"
+
+    unset retvar; declare retvar
+    ${cmd} -r retvar "" >/dev/null
+    assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${retvar}" \
+      "single item list to RETVAR on empty string input"
+  }
+
+  unset assert_from_args
 } && __test_from_args
