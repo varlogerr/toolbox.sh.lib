@@ -41,7 +41,6 @@ __test_from_args() {
   res_exp="* one"$'\n'"* two"$'\n'"  "
   input=("one" "two"$'\n')
   unset retvars; declare -A retvars
-  local flagname
   {
     res_act="$(${cmd} "${input[@]}")"
     assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${res_act}" \
