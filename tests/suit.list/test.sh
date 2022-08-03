@@ -41,6 +41,7 @@ __test_from_args() {
   res_exp="* one"$'\n'"* two"$'\n'"  "
   input=("one" "two"$'\n')
   unset retvars; declare -A retvars
+  unset rcs; declare -A rcs
   {
     res_act="$(${cmd} "${input[@]}")"
     assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${res_act}" \
@@ -48,12 +49,13 @@ __test_from_args() {
 
     for f in -r --retvar; do
       ${cmd} "${input[@]}" ${f} retvars[$f] >/dev/null
-      assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${retvars[$f]}" \
+      rcs[$f]=$?
+      assert_from_args "${SHLIB_OK}" "${rcs[$f]}" "${res_exp}" "${retvars[$f]}" \
         "multi items with with single line to RETVAR: ${f}"
     done
 
-    assert_from_args 0 0 "${retvars[-r]}" "${retvars[--retvar]}" \
-      "-r and --retvar flags provide same RETVAR value"
+    assert_from_args "${rcs[-r]}" "${rcs[--retvar]}" "${retvars[-r]}" "${retvars[--retvar]}" \
+      "-r and --retvar flags provide same result"
   }
 
   unset assert_from_args
