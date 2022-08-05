@@ -6,15 +6,15 @@ __test_escape_rex() {
 
   local cmd=sed_escape_rex
 
-  res_exp=''
-  res_act="$(${cmd})"
+  res_exp='shlib_sed_escape_rex: REX is required'
+  res_act="$(${cmd} 2>&1)"
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "${cmd} fails with SHLIB_ERRSYS and empty stdout on no REX"
 
   res_exp=''
   unset retvar; declare retvar
   for f in -r --retvar; do
-    ${cmd} "${f}" retvar >/dev/null
+    ${cmd} "${f}" retvar 2>/dev/null
     assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${retvar+x}" \
       "${cmd} fails with SHLIB_ERRSYS and no RETVAR on no REX: ${f}"
   done
@@ -43,8 +43,8 @@ __test_escape_rex() {
   assert_result "${SHLIB_OK}" "${?}" "${res_exp}" "${retvar}${retvar+x}" \
     "${cmd} succeeds with empty RETVAR on empty REX"
 
-  res_exp=''
-  res_act="$(${cmd} '-r')"
+  res_exp='shlib_sed_escape_rex: REX is required'
+  res_act="$(${cmd} '-r' 2>&1)"
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "${cmd} fails with SHLIB_ERRSYS and empty stdout on flag-like REX"
 
@@ -59,14 +59,14 @@ __test_escape_rex() {
   assert_result "${SHLIB_OK}" "${?}" "${res_exp}" "${retvar}" \
     "${cmd} escapes to RETVAR on flag-like REX after \`--\`"
 
-  res_exp=''
-  res_act="$(${cmd} '' '')"
+  res_exp='shlib_sed_escape_rex: multiple REX is not allowed'
+  res_act="$(${cmd} '' '' 2>&1)"
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "${cmd} fails with SHLIB_ERRSYS and empty stdout on multiple REX"
 
   unset retvar; declare retvar
   res_exp=''
-  ${cmd} -r retvar '' ''
+  ${cmd} -r retvar '' '' 2>/dev/null
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${retvar+x}" \
     "${cmd} fails with SHLIB_ERRSYS and no RETVAR on multiple REX"
 } && __test_escape_rex
@@ -76,15 +76,15 @@ __test_escape_replace() {
 
   local cmd=sed_escape_replace
 
-  res_exp=''
-  res_act="$(${cmd})"
+  res_exp='shlib_sed_escape_replace: REPLACE is required'
+  res_act="$(${cmd} 2>&1)"
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "${cmd} fails with SHLIB_ERRSYS and empty stdout on no REPLACE"
 
   res_exp=''
   unset retvar; declare retvar
   for f in -r --retvar; do
-    ${cmd} "${f}" retvar >/dev/null
+    ${cmd} "${f}" retvar 2>/dev/null
     assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${retvar+x}" \
       "${cmd} fails with SHLIB_ERRSYS and no RETVAR on no REPLACE: ${f}"
   done
@@ -113,8 +113,8 @@ __test_escape_replace() {
   assert_result "${SHLIB_OK}" "${?}" "${res_exp}" "${retvar}${retvar+x}" \
     "${cmd} succeeds with empty RETVAR on empty REPLACE"
 
-  res_exp=''
-  res_act="$(${cmd} '-r')"
+  res_exp='shlib_sed_escape_replace: REPLACE is required'
+  res_act="$(${cmd} '-r' 2>&1)"
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "${cmd} fails with SHLIB_ERRSYS and empty stdout on flag-like REPLACE"
 
@@ -129,14 +129,14 @@ __test_escape_replace() {
   assert_result "${SHLIB_OK}" "${?}" "${res_exp}" "${retvar}" \
     "${cmd} escapes to RETVAR on flag-like REPLACE after \`--\`"
 
-  res_exp=''
-  res_act="$(${cmd} '' '')"
+  res_exp='shlib_sed_escape_replace: multiple REPLACE is not allowed'
+  res_act="$(${cmd} '' '' 2>&1)"
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "${cmd} fails with SHLIB_ERRSYS and empty stdout on multiple REPLACE"
 
   unset retvar; declare retvar
   res_exp=''
-  ${cmd} -r retvar '' ''
+  ${cmd} -r retvar '' '' 2>/dev/null
   assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${retvar+x}" \
     "${cmd} fails with SHLIB_ERRSYS and no RETVAR on multiple REPLACE"
 } && __test_escape_replace
@@ -148,22 +148,22 @@ __test_escape_common() {
 
   local cmd
   for cmd in "${cmds[@]}"; do
-    res_exp=''
-    res_act="$(${cmd} -r '-retvar' '')"
+    res_exp="shlib_${cmd}: invalid RETVAR name: -retvar"
+    res_act="$(${cmd} -r '-retvar' '' 2>&1)"
     assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
       "${cmd} fails with SHLIB_ERRSYS and empty stdout on invalid RETVAR name"
 
     unset retvar1; declare retvar1
     unset retvar2; declare retvar2
-    res_exp=''
-    res_act="$(${cmd} -r retvar1 -r retvar2 '')"
+    res_exp="shlib_${cmd}: multiple RETVAR is not allowed"
+    res_act="$(${cmd} -r retvar1 -r retvar2 '' 2>&1)"
     assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
       "${cmd} fails with SHLIB_ERRSYS and empty stdout on multiple RETVAR"
 
     unset retvar1; declare retvar1
     unset retvar2; declare retvar2
     res_exp=''
-    ${cmd} -r retvar1 -r retvar2 ''
+    ${cmd} -r retvar1 -r retvar2 '' 2> /dev/null
     assert_result "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${retvar1+x}${retvar2+x}" \
       "${cmd} fails with SHLIB_ERRSYS and no RETVAR on multiple RETVAR"
   done

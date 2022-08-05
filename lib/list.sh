@@ -31,15 +31,15 @@ shlib_list_from_args() {
   _lfa_prefixes+=('* ')
 
   [[ "${#_lfa_retvarnames[@]}" -gt 1 ]] && {
-    echo "${FUNCNAME[0]}: Multiple RETVAR is not allowed" >&2
+    echo "${FUNCNAME[0]}: multiple RETVAR is not allowed" >&2
     return ${SHLIB_ERRSYS}
   }
   [[ "${#_lfa_prefixes[@]}" -gt 2 ]] && {
-    echo "${FUNCNAME[0]}: Multiple PREFIX is not allowed" >&2
+    echo "${FUNCNAME[0]}: multiple PREFIX is not allowed" >&2
     return ${SHLIB_ERRSYS}
   }
   [[ "${#_lfa_offsets[@]}" -gt 1 ]] && {
-    echo "${FUNCNAME[0]}: Multiple OFFSET is not allowed" >&2
+    echo "${FUNCNAME[0]}: multiple OFFSET is not allowed" >&2
     return ${SHLIB_ERRSYS}
   }
 

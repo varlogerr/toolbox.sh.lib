@@ -73,18 +73,18 @@ __test_from_args() {
   assert_from_args "${SHLIB_OK}" "${?}" "${res_exp}" "${res_act}" \
     "option-like param processed as ITEM after endopts"
 
-  res_exp="shlib_list_from_args: Multiple RETVAR is not allowed"
+  res_exp="shlib_list_from_args: multiple RETVAR is not allowed"
   declare ret1 ret2
   res_act="$("${cmd}" -r ret1 -r ret2 2>&1)"
   assert_from_args "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "fails with SHLIB_ERRSYS and error message on multiple RETVAR"
 
-  res_exp="shlib_list_from_args: Multiple PREFIX is not allowed"
+  res_exp="shlib_list_from_args: multiple PREFIX is not allowed"
   res_act="$("${cmd}" -p '- ' -p '- ' 2>&1)"
   assert_from_args "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "fails with SHLIB_ERRSYS and error message on multiple PREFIX"
 
-  res_exp="shlib_list_from_args: Multiple OFFSET is not allowed"
+  res_exp="shlib_list_from_args: multiple OFFSET is not allowed"
   res_act="$("${cmd}" --offset 4 --offset 4 2>&1)"
   assert_from_args "${SHLIB_ERRSYS}" "${?}" "${res_exp}" "${res_act}" \
     "fails with SHLIB_ERRSYS and error message on multiple OFFSET"

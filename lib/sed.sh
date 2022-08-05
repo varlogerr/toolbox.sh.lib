@@ -8,13 +8,22 @@ ${aliased} && {
 shlib_sed_escape_rex() {
   local -A _er_opts
 
-  __shlib_sed_escape_parse_opts _er_opts "${@}" || return ${?}
+  __shlib_sed_escape_parse_opts _er_opts "${@}" || {
+    local rc=$?
+    [[ ${rc} -eq 1 ]] && echo "${FUNCNAME[0]}: REX is required" >&2
+    [[ ${rc} -eq 2 ]] && echo "${FUNCNAME[0]}: multiple REX is not allowed" >&2
+    [[ ${rc} -eq 4 ]] && echo "${FUNCNAME[0]}: multiple RETVAR is not allowed" >&2
+    return ${SHLIB_ERRSYS}
+  }
 
   local _er_rex="${_er_opts[pos]}"
   local _er_retvarname
   [[ -n "${_er_opts[retvar]+x}" ]] && {
     local -n _er_retvarname="${_er_opts[retvar]}" \
-      2>/dev/null || return "${SHLIB_ERRSYS}"
+      2>/dev/null || {
+        echo "${FUNCNAME[0]}: invalid RETVAR name: ${_er_opts[retvar]}" >&2
+        return "${SHLIB_ERRSYS}"
+      }
   }
 
   _er_retvarname="$(sed -e 's/[]\/$*.^[]/\\&/g' <<< "${_er_rex}")"
@@ -25,13 +34,22 @@ shlib_sed_escape_rex() {
 shlib_sed_escape_replace() {
   local -A _er_opts
 
-  __shlib_sed_escape_parse_opts _er_opts "${@}" || return ${?}
+  __shlib_sed_escape_parse_opts _er_opts "${@}" || {
+    local rc=$?
+    [[ ${rc} -eq 1 ]] && echo "${FUNCNAME[0]}: REPLACE is required" >&2
+    [[ ${rc} -eq 2 ]] && echo "${FUNCNAME[0]}: multiple REPLACE is not allowed" >&2
+    [[ ${rc} -eq 4 ]] && echo "${FUNCNAME[0]}: multiple RETVAR is not allowed" >&2
+    return ${SHLIB_ERRSYS}
+  }
 
   local _er_replace="${_er_opts[pos]}"
   local _er_retvarname
   [[ -n "${_er_opts[retvar]+x}" ]] && {
     local -n _er_retvarname="${_er_opts[retvar]}" \
-      2>/dev/null || return "${SHLIB_ERRSYS}"
+      2>/dev/null || {
+        echo "${FUNCNAME[0]}: invalid RETVAR name: ${_er_opts[retvar]}" >&2
+        return "${SHLIB_ERRSYS}"
+      }
   }
 
   _er_retvarname="$(sed -e 's/[\/&]/\\&/g' <<< "${_er_replace}")"
@@ -39,6 +57,10 @@ shlib_sed_escape_replace() {
   return "${SHLIB_OK}"
 }
 
+# internal RCs:
+# 1 - no positional
+# 2 - multiple positionals
+# 4 - multiple retvar
 __shlib_sed_escape_parse_opts() {
   local -n _epo_opts="${1}"
   shift
@@ -60,8 +82,9 @@ __shlib_sed_escape_parse_opts() {
     shift
   done
 
-  [[ ${#_epo_positional[@]} -ne 1 ]] && return "${SHLIB_ERRSYS}"
-  [[ ${#_epo_retvarnames[@]} -gt 1 ]] && return "${SHLIB_ERRSYS}"
+  [[ ${#_epo_positional[@]} -lt 1 ]] && return 1
+  [[ ${#_epo_positional[@]} -gt 1 ]] && return 2
+  [[ ${#_epo_retvarnames[@]} -gt 1 ]] && return 4
 
   _epo_opts[pos]="${_epo_positional[0]}"
   [[ ${#_epo_retvarnames[@]} -gt 0 ]] && _epo_opts[retvar]="${_epo_retvarnames[0]}"
