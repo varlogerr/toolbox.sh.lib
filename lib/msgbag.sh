@@ -12,45 +12,33 @@ ${aliased} && {
   list2msgbag() { shlib_msgbag_from_list "${@}"; }
 }
 
-# Add messages to the BOXNAME message bag
-#
-# USAGE:
-# ```sh
-# shlib_msgbag_add BOXNAME MSG...
-# ```
-#
-# RC:
-# 0 - operation successful
-# 1 - no messages to add (silent)
-#     or input error from stderr
-#
-# DEMO:
-# ```sh
-# declare msgs_str
-# shlib_msgbag_add msgs_str "hello" "world"
-#
-# declare -a msgs_arr
-# shlib_msgbag_add msgs_arr "hello" "world"
-#
-# declare -A msgs_map
-# shlib_msgbag_add msgs_map[msgs] "hello" "world"
-# ```
 shlib_msgbag_add() {
-  local -n __msgbag_add="${1}" || return $?
-  shift
+  local _ma_rc=${SHLIB_OK}
+  local _ma_bagref
+  [[ -n "${1+x}" ]] && {
+    local -n _ma_bagref="${1}" 2>/dev/null || {
+      echo "${FUNCNAME[0]}: invalid BAGREF value: ${1}" >&2
+      _ma_rc="$(shlib_excode_add ${_ma_rc} ${SHLIB_ERRSYS})"
+    }
+    shift
+  } || {
+    echo "${FUNCNAME[0]}: BAGREF is required" >&2
+    _ma_rc="$(shlib_excode_add ${_ma_rc} ${SHLIB_ERRSYS})"
+  }
 
-  [[ ${#} -gt 0 ]] || return 1
+  if [[ ${#} -lt 1 ]] \
+    || $(shlib_excode_contains ${_ma_rc} ${SHLIB_ERRSYS}) \
+  ; then return ${_ma_rc}; fi
 
-  declare -a msgs=("${@}")
-  [[ "$(declare -p "${!__msgbag_add}" 2> /dev/null)" =~ ^'declare -'[a-zA-Z]*'a' ]] && {
-    __msgbag_add+=("${msgs[@]}")
+  [[ "$(declare -p "${!_ma_bagref}" 2> /dev/null)" =~ ^'declare -'[a-zA-Z]*'a' ]] && {
+    _ma_bagref+=("${@:1}")
     return 0
   }
 
-  declare list="$(shlib_arr_to_list msgs)"
-  __msgbag_add+="${__msgbag_add:+$'\n'}${list}"
+  declare _ma_appendix="$(shlib_list_from_args "${@}")"
+  _ma_bagref+="${_ma_bagref:+$'\n'}${_ma_appendix}"
 
-  return 0
+  return ${_ma_rc}
 }
 
 # Get count of messages in the BOXNAME message bag

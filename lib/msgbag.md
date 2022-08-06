@@ -66,7 +66,7 @@ if ! shlib_msgbag_add - "error1" "error2"; then
 fi
 ```
 
-[To top]
+[^ To top]
 
 ## Exit codes
 
@@ -98,13 +98,15 @@ rc=$?
 
 The only exclusion for exit code combination is `SHLIB_MSGBAG_BADREF`, it halts functions immediately.
 
-[To top]
+[^ To top]
 
 ## <a id="add"></a>`shlib_msgbag_add`
 
 Add MSG messages to BAGREF message bag
 
-Aliases: `msgbag_add`
+**Aliases**: `msgbag_add`
+
+### Usage
 
 ```sh
 shlib_msgbag_add BAGREF [MSG...]
@@ -116,8 +118,8 @@ None
 
 ### Exit codes
 
-* `SHLIB_MSGBAG_OK`
-* `SHLIB_MSGBAG_NOMSG`
+* [`SHLIB_OK`](./excode.md#shlib_ok)
+* [`SHLIB_ERRSYS`](./excode.md#shlib_errsys)
 
 ### Demo
 
@@ -132,7 +134,7 @@ msgbag_add messenger1 "multiline
 message"
 ```
 
-[To top]
+[^ To top]
 
 ## <a id="from_list"></a>`shlib_msgbag_from_list`
 
@@ -264,6 +266,6 @@ msgbag_len -r messenger1_len messenger1 > /dev/null
 echo ${messenger1_len}
 ```
 
-[To top]
+[^ To top]
 
-[To top]: #top
+[^ To top]: #top
