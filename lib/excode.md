@@ -19,7 +19,7 @@ TBD
 
 * <a id="shlib_ok"></a>`SHLIB_OK=0` - all is fine
 * <a id="shlib_ko"></a>`SHLIB_KO=1` - meant for boolean returning functions (like `is_valid`) where exit code is supposed to be the answer
-* <a id="shlib_errsys"></a>`SHLIB_ERRSYS=2` - invalid function usage (not enough / invalid args, etc.). This error is always silent, i.e. no `stderr` or `errbag`. Function fails immediately after this error.
+* <a id="shlib_errsys"></a>`SHLIB_ERRSYS=2` - invalid function usage (not enough / invalid args, etc.). Function fails immediately after this error.
 
 [^ To top]
 
