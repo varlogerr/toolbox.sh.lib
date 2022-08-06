@@ -8,6 +8,7 @@ ${aliased} && {
 
 shlib_list_from_args() {
   local -a _lfa_items
+  local _lfa_rc=${SHLIB_OK}
 
   local -a _lfa_retvarnames
   local -a _lfa_prefixes
@@ -32,15 +33,15 @@ shlib_list_from_args() {
 
   [[ "${#_lfa_retvarnames[@]}" -gt 1 ]] && {
     echo "${FUNCNAME[0]}: multiple RETVAR is not allowed" >&2
-    return ${SHLIB_ERRSYS}
+    _lfa_rc=$(shlib_excode_add ${_lfa_rc} ${SHLIB_ERRSYS})
   }
   [[ "${#_lfa_prefixes[@]}" -gt 2 ]] && {
     echo "${FUNCNAME[0]}: multiple PREFIX is not allowed" >&2
-    return ${SHLIB_ERRSYS}
+    _lfa_rc=$(shlib_excode_add ${_lfa_rc} ${SHLIB_ERRSYS})
   }
   [[ "${#_lfa_offsets[@]}" -gt 1 ]] && {
     echo "${FUNCNAME[0]}: multiple OFFSET is not allowed" >&2
-    return ${SHLIB_ERRSYS}
+    _lfa_rc=$(shlib_excode_add ${_lfa_rc} ${SHLIB_ERRSYS})
   }
 
   local _lfa_retvar
@@ -48,7 +49,7 @@ shlib_list_from_args() {
     local -n _lfa_retvar="${_lfa_retvarnames[0]}" \
       2>/dev/null || {
         echo "${FUNCNAME[0]}: Invalid RETVAR name: ${_lfa_retvarnames[0]}" >&2
-        return ${SHLIB_ERRSYS}
+        _lfa_rc=$(shlib_excode_add ${_lfa_rc} ${SHLIB_ERRSYS})
       }
   }
   local _lfa_offset_len
@@ -57,9 +58,11 @@ shlib_list_from_args() {
     test "${_lfa_offset_len}" -ge 0 \
       2>/dev/null || {
         echo "${FUNCNAME[0]}: OFFSET must be a >= 0 number: ${_lfa_offset_len}" >&2
-        return ${SHLIB_ERRSYS}
+        _lfa_rc=$(shlib_excode_add ${_lfa_rc} ${SHLIB_ERRSYS})
       }
   }
+
+  shlib_excode_contains ${_lfa_rc} ${SHLIB_ERRSYS} && return ${_lfa_rc}
 
   # no items to process
   [[ "${#_lfa_items[@]}" -lt 1 ]] && return ${SHLIB_OK}

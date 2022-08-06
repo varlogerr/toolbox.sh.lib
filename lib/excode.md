@@ -18,8 +18,8 @@ TBD
 ## Exported variables
 
 * <a id="shlib_ok"></a>`SHLIB_OK=0` - all is fine
-* <a id="shlib_ko"></a>`SHLIB_KO=1` - meant for boolean returning functions (like `is_valid`) where exit code is supposed to be the answer
-* <a id="shlib_errsys"></a>`SHLIB_ERRSYS=2` - invalid function usage (not enough / invalid args, etc.). Function fails immediately after this error.
+* <a id="shlib_ko"></a>`SHLIB_KO=1` - meant for boolean returning functions (like `is_valid`) where exit code is supposed to be the answer, or for signifying that operation is performed, but something was wrong (normally accompanied with stderr messages if not documented different).
+* <a id="shlib_errsys"></a>`SHLIB_ERRSYS=2` - invalid function usage (not enough / invalid args, etc.). Accompanied with stderr messages.
 
 [^ To top]
 

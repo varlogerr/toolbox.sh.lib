@@ -7,13 +7,14 @@ ${aliased} && {
 
 shlib_sed_escape_rex() {
   local -A _er_opts
+  local _er_rc=${SHLIB_OK}
 
   __shlib_sed_escape_parse_opts _er_opts "${@}" || {
     local rc=$?
     [[ ${rc} -eq 1 ]] && echo "${FUNCNAME[0]}: REX is required" >&2
     [[ ${rc} -eq 2 ]] && echo "${FUNCNAME[0]}: multiple REX is not allowed" >&2
     [[ ${rc} -eq 4 ]] && echo "${FUNCNAME[0]}: multiple RETVAR is not allowed" >&2
-    return ${SHLIB_ERRSYS}
+    _er_rc="$(shlib_excode_add ${_er_rc} ${SHLIB_ERRSYS})"
   }
 
   local _er_rex="${_er_opts[pos]}"
@@ -22,9 +23,11 @@ shlib_sed_escape_rex() {
     local -n _er_retvarname="${_er_opts[retvar]}" \
       2>/dev/null || {
         echo "${FUNCNAME[0]}: invalid RETVAR name: ${_er_opts[retvar]}" >&2
-        return "${SHLIB_ERRSYS}"
+        _er_rc="$(shlib_excode_add ${_er_rc} ${SHLIB_ERRSYS})"
       }
   }
+
+  shlib_excode_contains ${_er_rc} ${SHLIB_ERRSYS} && return ${_er_rc}
 
   _er_retvarname="$(sed -e 's/[]\/$*.^[]/\\&/g' <<< "${_er_rex}")"
   printf '%s\n' "${_er_retvarname}"
@@ -33,13 +36,14 @@ shlib_sed_escape_rex() {
 
 shlib_sed_escape_replace() {
   local -A _er_opts
+  local _er_rc=${SHLIB_OK}
 
   __shlib_sed_escape_parse_opts _er_opts "${@}" || {
     local rc=$?
     [[ ${rc} -eq 1 ]] && echo "${FUNCNAME[0]}: REPLACE is required" >&2
     [[ ${rc} -eq 2 ]] && echo "${FUNCNAME[0]}: multiple REPLACE is not allowed" >&2
     [[ ${rc} -eq 4 ]] && echo "${FUNCNAME[0]}: multiple RETVAR is not allowed" >&2
-    return ${SHLIB_ERRSYS}
+    _er_rc="$(shlib_excode_add ${_er_rc} ${SHLIB_ERRSYS})"
   }
 
   local _er_replace="${_er_opts[pos]}"
@@ -48,9 +52,11 @@ shlib_sed_escape_replace() {
     local -n _er_retvarname="${_er_opts[retvar]}" \
       2>/dev/null || {
         echo "${FUNCNAME[0]}: invalid RETVAR name: ${_er_opts[retvar]}" >&2
-        return "${SHLIB_ERRSYS}"
+        _er_rc="$(shlib_excode_add ${_er_rc} ${SHLIB_ERRSYS})"
       }
   }
+
+  shlib_excode_contains ${_er_rc} ${SHLIB_ERRSYS} && return ${_er_rc}
 
   _er_retvarname="$(sed -e 's/[\/&]/\\&/g' <<< "${_er_replace}")"
   printf '%s\n' "${_er_retvarname}"
