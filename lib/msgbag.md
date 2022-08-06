@@ -5,8 +5,9 @@
 * [Intro](#intro)
 * [Exit codes](#exit-codes)
 * [`shlib_msgbag_add`](#add)
-* [`shlib_msgbag_from_list`](#from_list)
-* [`shlib_msgbag_len`](#len)
+* [`shlib_msgbag_get`](#get) (TBD)
+* [`shlib_msgbag_from_list`](#from_list) (TBD)
+* [`shlib_msgbag_len`](#len) (TBD)
 
 ## Intro
 
@@ -132,6 +133,47 @@ msgbag_add messenger1 "message 1" "message 2"
 # add 3-d message to messenger1
 msgbag_add messenger1 "multiline
 message"
+```
+
+[^ To top]
+
+## <a id="get"></a>`shlib_msgbag_get`
+
+Get BAGREF message bag messages to RETREF array
+
+**Aliases**: `msgbag_get`
+
+### Usage
+
+```sh
+shlib_msgbag_get BAGREF RETREF
+```
+
+### Options
+
+None
+
+### Exit codes
+
+* [`SHLIB_OK`](./excode.md#shlib_ok)
+* [`SHLIB_ERRSYS`](./excode.md#shlib_errsys)
+
+### Demo
+
+```sh
+declare messenger1
+declare -a messages1
+
+# add 2 messages to messenger1
+msgbag_add messenger1 "message 1" "message 2"
+# get messenger1 messages to messages1
+msgbag_add messenger1 messages1
+# ouput:
+# ```
+# message 1
+# message 2
+# ```
+printf '%s\n' "${messages1[@]}"
 ```
 
 [^ To top]

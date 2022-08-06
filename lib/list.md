@@ -4,7 +4,7 @@
 
 * [Intro](#intro)
 * [`shlib_list_from_args`](#from-args)
-* [`shlib_arr_from_list`](#from-list)
+* [`shlib_list_to_arr`](#to-arr) (TBD)
 
 ## Intro
 
@@ -71,32 +71,59 @@ printf '%s\n' "${retvar}"
 
 [^ To top]
 
-## <a id="TBD"></a>`TBD`
+## <a id="to-arr"></a>`shlib_list_to_arr`
 
-TBD
+Put list items to 
 
-**Aliases**: `TBD`
+**Aliases**: `args2list`
 
-**Dependencies**: TBD
+**Dependencies**: `shlib_excode`
 
 ### Usage
 
 ```sh
-TBD
+shlib_list_from_args [-p|--prefix PREFIX] \
+  [--offset OFFSET] [--] RETREF [-] [LISTFILE...] [<<< LIST]
 ```
 
 ### Options
 
-TBD
+```
+--            end of option arguments
+-p, --prefix  list item prefix, defaults to '* '
+--offset      offset length for not prefixed lines,
+              defaults to PREFIX length
+```
 
 ### Exit codes
 
-TBD
+* [`SHLIB_OK`](./excode.md#shlib_ok)
+* [`SHLIB_ERRSYS`](./excode.md#shlib_errsys)
 
 ### Demo
 
 ```sh
-TBD
+declare -a args=(1 "2"$'\n'3)
+
+# outputs:
+# * 1
+# * 2
+#   3
+args2list -- "${args[0]}" "${args[1]}"
+
+# outputs:
+# - 1
+# - 2
+#   3
+args2list -p '- ' -- "${args[@]}"
+
+# outputs:
+# * 1
+# * 2
+#     3
+declare retvar
+args2list -r retvar --offset 4 -- "${args[@]}" >/dev/null
+printf '%s\n' "${retvar}"
 ```
 
 [^ To top]
